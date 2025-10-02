@@ -15,7 +15,7 @@ int main() {
         std::cin >> filename;
 
         PresetPointProvider provider(filename);
-        auto points = provider.getPoints();
+        std::vector<Point> points = provider.getPoints();
 
         App app(1200, 800, 60, points);
         app.run();

@@ -8,12 +8,15 @@
 #include <stdexcept>
 
 class PresetPointProvider : public IPointProvider {
-    std::string m_filename;
 
 public:
     explicit PresetPointProvider(const std::string& filename);
 
     std::vector<Point> getPoints() override;
+
+private:
+    std::string m_filename;
+
 };
 
 #endif //PRESETPOINTPROVIDER_H

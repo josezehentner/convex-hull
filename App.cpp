@@ -6,13 +6,6 @@ App::App()
     window.setFramerateLimit(m_frameLimit);
 }
 
-App::App(unsigned int width, unsigned int height, unsigned int frameLimit)
-: window(sf::VideoMode({width, height}), "SFML works!"),
-  m_frameLimit(frameLimit)
-{
-    window.setFramerateLimit(m_frameLimit);
-}
-
 App::App(unsigned int width, unsigned int height, unsigned int frameLimit, const std::vector<Point>& points)
 : window(sf::VideoMode({width, height}), "SFML works!"),
   m_frameLimit(frameLimit),

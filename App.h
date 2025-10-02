@@ -2,12 +2,11 @@
 #define APP_H
 
 #include <SFML/Graphics.hpp>
-#include "Point.h"
+#include "point_providers/Point.h"
 
 class App {
 public:
     App();
-    App(unsigned int width, unsigned int height, unsigned int frameLimit);
     App(unsigned int width, unsigned int height, unsigned int frameLimit, const std::vector<Point>& points);
     void run();
 
