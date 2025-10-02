@@ -7,10 +7,10 @@
 #include <sstream>
 #include <stdexcept>
 
-class PresetPointProvider : public IPointProvider {
+class FromFilePointProvider : public IPointProvider {
 
 public:
-    explicit PresetPointProvider(const std::string& filename);
+    explicit FromFilePointProvider(const std::string& filename);
 
     std::vector<Point> getPoints() override;
 

@@ -1,9 +1,9 @@
-#include "PresetPointProvider.h"
+#include "FromFilePointProvider.h"
 
-PresetPointProvider::PresetPointProvider(const std::string& filename)
+FromFilePointProvider::FromFilePointProvider(const std::string& filename)
     : m_filename(filename) {}
 
-std::vector<Point> PresetPointProvider::getPoints() {
+std::vector<Point> FromFilePointProvider::getPoints() {
     std::vector<Point> points;
     std::ifstream file(m_filename);
 

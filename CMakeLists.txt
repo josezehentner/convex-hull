@@ -6,14 +6,17 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
 
 add_executable(convex_hull main.cpp
-        App.cpp
-        App.h
+        visualization/App.cpp
+        visualization/App.h
         point_providers/Point.h
         point_providers/IPointProvider.h
         point_providers/RandomPointProvider.cpp
         point_providers/RandomPointProvider.h
-        point_providers/PresetPointProvider.cpp
-        point_providers/PresetPointProvider.h)
+        point_providers/FromFilePointProvider.cpp
+        point_providers/FromFilePointProvider.h
+        algorithms/IAlgorithm.h
+        algorithms/AndrewAlgorithm.cpp
+        algorithms/AndrewAlgorithm.h)
 
 target_include_directories(convex_hull PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
