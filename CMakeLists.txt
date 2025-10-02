@@ -7,7 +7,13 @@ find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
 
 add_executable(convex_hull main.cpp
         App.cpp
-        App.h)
+        App.h
+        Point.h
+        point_providers/IPointProvider.h
+        point_providers/RandomPointProvider.cpp
+        point_providers/RandomPointProvider.h
+        point_providers/PresetPointProvider.cpp
+        point_providers/PresetPointProvider.h)
 
 target_include_directories(convex_hull PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
