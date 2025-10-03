@@ -1,5 +1,5 @@
 #include "AndrewAlgorithm.h"
-
+#include <iostream>
 
 // Complete implementation not finished
 AndrewAlgorithm::AndrewAlgorithm(const std::vector<Point>& points) {
@@ -16,19 +16,22 @@ void AndrewAlgorithm::reset(const std::vector<Point>& points) {
     m_phase = Phase::UPPER;
 
     std::sort(m_points.begin(), m_points.end(), [](const Point& a, const Point& b) {
-        return (a.x < b.x) || (a.x == b.x && a.y < b.y);
+        return (a.x < b.x) || (a.x == b.x && a.y < b.y); // Sorts x-coords, if x-coords are equal sort by y-coords
     });
 }
 
 
 // Cross product (orientation test)
-float AndrewAlgorithm::cross(const Point& O, const Point& A, const Point& B) {
+float AndrewAlgorithm::CrossProduct(const Point& O, const Point& A, const Point& B) {
+    // If > 0 -> left turn (resp. up in the visualization), if < 0 -> right turn (resp. down in the visualization)
     return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
 }
 
 // Add point to chain with convexity check
 void AndrewAlgorithm::addPointToChain(std::vector<Point>& chain, const Point& p) {
-    while (chain.size() >= 2 && cross(chain[chain.size()-2], chain.back(), p) <= 0) {
+    // Part after && checks if cross product is <, =, or > than 0
+    // right now its <= 0, so it builds the hull clockwise, if we switch to >= 0 we build counterclockwise
+    while (chain.size() >= 2 && CrossProduct(chain[chain.size()-2], chain.back(), p) <= 0) {
         chain.pop_back();
     }
     chain.push_back(p);
@@ -68,6 +71,7 @@ bool AndrewAlgorithm::step() {
     return false;
 }
 
+// needed for render() in App.cpp
 bool AndrewAlgorithm::isFinished() const
 {
     return m_finished;
@@ -77,16 +81,16 @@ bool AndrewAlgorithm::isFinished() const
 std::vector<Point> AndrewAlgorithm::getCurrentHull() {
     if (m_phase == Phase::UPPER) {
         return m_upper;
-    } else if (m_phase == Phase::LOWER) {
+    }
+    if (m_phase == Phase::LOWER) {
         std::vector<Point> current = m_upper;
         // append partial lower
         for (size_t i = 0; i < m_lower.size(); i++) {
             current.push_back(m_lower[i]);
         }
         return current;
-    } else {
-        return m_hull; // final
     }
+    return m_hull;
 }
 
 std::vector<Point> AndrewAlgorithm::runCompleteAlgorithm(const std::vector<Point>& points) {

@@ -75,6 +75,7 @@ void App::render()
         window.draw(shape);
     }
 
+    // Draws connection lines
     std::vector<Point> hull = m_algorithm->getCurrentHull();
     if (!hull.empty())
     {
