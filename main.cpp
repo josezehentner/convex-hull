@@ -15,7 +15,7 @@ int main() {
         std::cout << "Enter = show whole algorithm" << std::endl;
         std::cout << "Space = step through algorithm" << std::endl;
         std::cout << "Esc = Quit visualization" << std::endl;
-        std::cout << "Enter filename (../points.txt): "; //TODO: Change to a better selection system
+        std::cout << "Enter filename (../point_files/square.txt): "; //TODO: Change to a better selection system
         std::cin >> filename;
 
         // consumes points from file and stores them in a vector

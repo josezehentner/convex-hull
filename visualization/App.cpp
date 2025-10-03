@@ -53,7 +53,6 @@ void App::processEvents()
 }
 
 
-
 // For animation
 void App::update()
 {
@@ -76,19 +75,25 @@ void App::render()
         window.draw(shape);
     }
 
-    auto hull = m_algorithm->getCurrentHull();
+    std::vector<Point> hull = m_algorithm->getCurrentHull();
     if (!hull.empty())
     {
-        sf::VertexArray lines(sf::PrimitiveType::LineStrip, hull.size() + 1);
+        bool finished = m_algorithm->isFinished();
+
+        size_t count = finished ? hull.size() + 1 : hull.size();
+        sf::VertexArray lines(sf::PrimitiveType::LineStrip, count);
+
         for (size_t i = 0; i < hull.size(); i++) {
             lines[i].position = {hull[i].x, hull[i].y};
             lines[i].color = sf::Color::Blue;
         }
-        lines[hull.size()].position = {hull[0].x, hull[0].y};
-        lines[hull.size()].color = sf::Color::Blue;
+
+        if (finished) {
+            lines[hull.size()].position = {hull[0].x, hull[0].y};
+            lines[hull.size()].color = sf::Color::Blue;
+        }
+
         window.draw(lines);
-
+        window.display();
     }
-
-    window.display();
 }
