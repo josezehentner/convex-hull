@@ -33,7 +33,6 @@ void App::processEvents()
 {
     while (const std::optional event = window.pollEvent())
     {
-        //TODO: Add event to reset algorithm
         if (event->is<sf::Event::KeyPressed>()) {
             auto key = event->getIf<sf::Event::KeyPressed>()->scancode;
             // Allows stepping through the algorithm with spacebar
@@ -48,10 +47,15 @@ void App::processEvents()
             if (key == sf::Keyboard::Scan::Escape) {
                 window.close();
             }
+            // Resets algo
             if (key == sf::Keyboard::Scan::R)
             {
                 m_algorithm->reset(m_points);
                 m_algorithm->step();
+            }
+            // Goes one step back
+            if (key == sf::Keyboard::Scan::Backspace) {
+                m_algorithm->stepBack();
             }
         }
     }
