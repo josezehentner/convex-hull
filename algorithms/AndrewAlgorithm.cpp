@@ -1,9 +1,8 @@
 #include "AndrewAlgorithm.h"
 #include <iostream>
 
-// Complete implementation not finished
 AndrewAlgorithm::AndrewAlgorithm(const std::vector<Point>& points) {
-    reset(points);
+    AndrewAlgorithm::reset(points);
 }
 
 void AndrewAlgorithm::reset(const std::vector<Point>& points) {
@@ -21,7 +20,7 @@ void AndrewAlgorithm::reset(const std::vector<Point>& points) {
 }
 
 
-// Cross product (orientation test)
+// Computes Crossproduct between points
 float AndrewAlgorithm::CrossProduct(const Point& O, const Point& A, const Point& B) {
     // If > 0 -> left turn (resp. up in the visualization), if < 0 -> right turn (resp. down in the visualization)
     return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
@@ -37,7 +36,7 @@ void AndrewAlgorithm::addPointToChain(std::vector<Point>& chain, const Point& p)
     chain.push_back(p);
 }
 
-// If the step is
+// Contains main algorithm logic
 bool AndrewAlgorithm::step() {
     if (m_finished) return false;
 
