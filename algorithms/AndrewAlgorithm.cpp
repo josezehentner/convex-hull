@@ -19,7 +19,6 @@ void AndrewAlgorithm::reset(const std::vector<Point>& points) {
     });
 }
 
-
 // Computes Crossproduct between points
 float AndrewAlgorithm::CrossProduct(const Point& O, const Point& A, const Point& B) {
     // If > 0 -> left turn (resp. up in the visualization), if < 0 -> right turn (resp. down in the visualization)

@@ -48,6 +48,11 @@ void App::processEvents()
             if (key == sf::Keyboard::Scan::Escape) {
                 window.close();
             }
+            if (key == sf::Keyboard::Scan::R)
+            {
+                m_algorithm->reset(m_points);
+                m_algorithm->step();
+            }
         }
     }
 }

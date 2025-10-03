@@ -15,6 +15,7 @@ int main() {
         std::cout << "Enter = show whole algorithm" << std::endl;
         std::cout << "Space = step through algorithm" << std::endl;
         std::cout << "Esc = Quit visualization" << std::endl;
+        std::cout << "R = Reset algorithm" << std::endl;
         std::cout << "Enter filename (../point_files/square.txt): "; //TODO: Change to a better selection system
         std::cin >> filename;
 
