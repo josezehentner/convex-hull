@@ -38,7 +38,7 @@ private:
     bool m_finished;
     Phase m_phase;
 
-    static float CrossProduct(const Point& O, const Point& A, const Point& B);
+    static float crossProduct(const Point& O, const Point& A, const Point& B);
     void addPointToChain(std::vector<Point>& chain, const Point& p);
 };
 

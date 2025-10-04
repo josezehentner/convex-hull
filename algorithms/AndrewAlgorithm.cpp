@@ -21,7 +21,7 @@ void AndrewAlgorithm::reset(const std::vector<Point>& points) {
 }
 
 // Computes Crossproduct between points
-float AndrewAlgorithm::CrossProduct(const Point& O, const Point& A, const Point& B) {
+float AndrewAlgorithm::crossProduct(const Point& O, const Point& A, const Point& B) {
     // If > 0 -> left turn (resp. up in the visualization), if < 0 -> right turn (resp. down in the visualization)
     return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
 }
@@ -30,7 +30,7 @@ float AndrewAlgorithm::CrossProduct(const Point& O, const Point& A, const Point&
 void AndrewAlgorithm::addPointToChain(std::vector<Point>& chain, const Point& p) {
     // Part after && checks if cross product is <, =, or > than 0
     // right now its <= 0, so it builds the hull clockwise, if we switch to >= 0 we build counterclockwise
-    while (chain.size() >= 2 && CrossProduct(chain[chain.size()-2], chain.back(), p) <= 0) {
+    while (chain.size() >= 2 && crossProduct(chain[chain.size()-2], chain.back(), p) <= 0) {
         chain.pop_back();
     }
     chain.push_back(p);

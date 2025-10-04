@@ -16,7 +16,8 @@ add_executable(convex_hull main.cpp
         point_providers/FromFilePointProvider.h
         algorithms/IAlgorithm.h
         algorithms/AndrewAlgorithm.cpp
-        algorithms/AndrewAlgorithm.h)
+        algorithms/AndrewAlgorithm.h
+)
 
 target_include_directories(convex_hull PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
