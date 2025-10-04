@@ -1,4 +1,3 @@
-
 #include "QuickHullAlgorithm.h"
 #include <algorithm>
 #include <cmath>
@@ -11,9 +10,13 @@ void QuickHullAlgorithm::reset(const std::vector<Point>& points) {
     m_points = points;
     m_hull.clear();
     m_tasks.clear();
+    m_currentLevelTasks.clear();
+    m_currentFarthestPoints.clear();
+    m_activePoints.clear();
+    m_pendingTasks.clear();
     m_finished = false;
-    m_hasCurrentSegment = false;
-    m_currentCandidates.clear();
+    m_phase = Phase::PREVIEW;
+    m_inPreviewPhase = false;
 
     if (m_points.size() < 3) {
         m_hull = m_points;
@@ -22,6 +25,7 @@ void QuickHullAlgorithm::reset(const std::vector<Point>& points) {
     }
 
     initialize();
+    updateActivePoints();
 }
 
 float QuickHullAlgorithm::cross(const Point& o, const Point& a, const Point& b) {
@@ -47,7 +51,6 @@ std::vector<Point> QuickHullAlgorithm::getPointsOnSide(const Point& a, const Poi
 }
 
 void QuickHullAlgorithm::initialize() {
-    // Find leftmost and rightmost points
     auto minIt = std::min_element(m_points.begin(), m_points.end(),
         [](const Point& a, const Point& b) { return a.x < b.x; });
     auto maxIt = std::max_element(m_points.begin(), m_points.end(),
@@ -59,11 +62,9 @@ void QuickHullAlgorithm::initialize() {
     m_hull.push_back(leftmost);
     m_hull.push_back(rightmost);
 
-    // Split points into upper and lower sets
     std::vector<Point> upperSet = getPointsOnSide(leftmost, rightmost, m_points, true);
     std::vector<Point> lowerSet = getPointsOnSide(leftmost, rightmost, m_points, false);
 
-    // Add tasks for upper and lower hulls
     if (!upperSet.empty()) {
         m_tasks.push_back({leftmost, rightmost, upperSet, 1});
     }
@@ -76,38 +77,91 @@ void QuickHullAlgorithm::initialize() {
     }
 }
 
-bool QuickHullAlgorithm::step() {
-    if (m_finished) {
-        m_hasCurrentSegment = false;
-        return false;
+void QuickHullAlgorithm::updateActivePoints() {
+    m_activePoints.clear();
+
+    for (const auto& p : m_hull) {
+        m_activePoints.insert(p);
     }
 
+    for (const auto& task : m_tasks) {
+        for (const auto& p : task.set) {
+            m_activePoints.insert(p);
+        }
+    }
+
+    for (const auto& task : m_currentLevelTasks) {
+        for (const auto& p : task.set) {
+            m_activePoints.insert(p);
+        }
+    }
+}
+
+void QuickHullAlgorithm::computePreview() {
     if (m_tasks.empty()) {
         m_finished = true;
-        m_hasCurrentSegment = false;
-        return false;
+        m_currentLevelTasks.clear();
+        m_currentFarthestPoints.clear();
+        m_inPreviewPhase = false;
+        return;
     }
 
-    // Count how many tasks are at the current level (to process together)
-    size_t currentLevelTasks = m_tasks.size();
+    // Store current level tasks for visualization
+    size_t currentLevelSize = m_tasks.size();
+    m_currentLevelTasks.clear();
+    m_pendingTasks.clear();
+
+    for (size_t i = 0; i < currentLevelSize; i++) {
+        m_currentLevelTasks.push_back(m_tasks[i]);
+        m_pendingTasks.push_back(m_tasks[i]);
+    }
+
+    m_currentFarthestPoints.clear();
+
+    // Find farthest points for each task (preview only, don't modify hull)
+    for (const auto& task : m_currentLevelTasks) {
+        if (task.set.empty()) {
+            continue;
+        }
+
+        float maxDist = 0;
+        Point farthest;
+        bool found = false;
+
+        for (const auto& p : task.set) {
+            float dist = distanceToLine(task.a, task.b, p);
+            if (dist > maxDist) {
+                maxDist = dist;
+                farthest = p;
+                found = true;
+            }
+        }
+
+        if (found) {
+            m_currentFarthestPoints.push_back(farthest);
+        }
+    }
+
+    m_inPreviewPhase = true;
+}
+
+void QuickHullAlgorithm::commitPreview() {
+    if (m_pendingTasks.empty()) {
+        m_inPreviewPhase = false;
+        return;
+    }
+
     std::deque<Task> nextLevelTasks;
 
-    // Process all tasks at the current level
-    for (size_t i = 0; i < currentLevelTasks; i++) {
+    // Now actually process and modify the hull
+    for (size_t i = 0; i < m_pendingTasks.size(); i++) {
         Task task = m_tasks.front();
         m_tasks.pop_front();
-
-        // Set current segment for visualization (use last processed task for display)
-        m_currentSegmentStart = task.a;
-        m_currentSegmentEnd = task.b;
-        m_currentCandidates = task.set;
-        m_hasCurrentSegment = true;
 
         if (task.set.empty()) {
             continue;
         }
 
-        // Find farthest point from line a-b
         float maxDist = 0;
         Point farthest;
         bool found = false;
@@ -125,29 +179,25 @@ bool QuickHullAlgorithm::step() {
             continue;
         }
 
-        m_currentFarthest = farthest;
-
-        // Insert farthest point into hull
+        // Actually insert into hull
         m_hull.insert(m_hull.begin() + task.insertPos, farthest);
 
-        // Update insertion positions for remaining current level tasks
+        // Update insertion positions
         for (auto& t : m_tasks) {
             if (t.insertPos >= task.insertPos) {
                 t.insertPos++;
             }
         }
-        // Update insertion positions for next level tasks
         for (auto& t : nextLevelTasks) {
             if (t.insertPos >= task.insertPos) {
                 t.insertPos++;
             }
         }
 
-        // Find points outside triangles a-farthest and farthest-b
+        // Create new tasks
         std::vector<Point> leftSet = getPointsOnSide(task.a, farthest, task.set, true);
         std::vector<Point> rightSet = getPointsOnSide(farthest, task.b, task.set, true);
 
-        // Add new tasks for next level
         if (!leftSet.empty()) {
             nextLevelTasks.push_back({task.a, farthest, leftSet, task.insertPos});
         }
@@ -156,12 +206,58 @@ bool QuickHullAlgorithm::step() {
         }
     }
 
-    // Add next level tasks to the queue
     for (const auto& task : nextLevelTasks) {
         m_tasks.push_back(task);
     }
 
-    return true;
+    m_pendingTasks.clear();
+    m_currentLevelTasks.clear();
+    m_currentFarthestPoints.clear();
+    m_inPreviewPhase = false;
+    updateActivePoints();
+}
+
+bool QuickHullAlgorithm::step() {
+    if (m_finished) {
+        return false;
+    }
+
+    if (m_phase == Phase::PREVIEW) {
+        computePreview();
+        m_phase = Phase::COMMIT;
+        return true;
+    } else { // COMMIT
+        commitPreview();
+        m_phase = Phase::PREVIEW;
+        updateActivePoints();
+        return !m_finished;
+    }
+}
+
+std::vector<std::pair<Point, Point>> QuickHullAlgorithm::getActiveSegments() const {
+    std::vector<std::pair<Point, Point>> segments;
+    for (const auto& task : m_currentLevelTasks) {
+        segments.push_back({task.a, task.b});
+    }
+    return segments;
+}
+
+std::vector<Point> QuickHullAlgorithm::getCandidatePoints() const {
+    std::vector<Point> candidates;
+    for (const auto& task : m_currentLevelTasks) {
+        for (const auto& p : task.set) {
+            candidates.push_back(p);
+        }
+    }
+    return candidates;
+}
+
+std::vector<Point> QuickHullAlgorithm::getFarthestPoints() const {
+    return m_currentFarthestPoints;
+}
+
+std::set<Point> QuickHullAlgorithm::getActivePoints() const {
+    return m_activePoints;
 }
 
 bool QuickHullAlgorithm::isFinished() const {

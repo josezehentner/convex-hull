@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 4.0)
 project(convex_hull)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -16,7 +16,12 @@ add_executable(convex_hull main.cpp
         point_providers/FromFilePointProvider.h
         algorithms/IAlgorithm.h
         algorithms/AndrewAlgorithm.cpp
-        algorithms/AndrewAlgorithm.h)
+        algorithms/AndrewAlgorithm.h
+        algorithms/QuickhullAlgorithm.h
+        algorithms/QuickhullAlgorithm.cpp
+        algorithms/QuickHullAlgorithm.cpp
+        algorithms/QuickHullAlgorithm.h
+)
 
 target_include_directories(convex_hull PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}

@@ -13,76 +13,74 @@ void AndrewAlgorithm::reset(const std::vector<Point>& points) {
     m_index = 0;
     m_finished = false;
     m_phase = Phase::UPPER;
-
+    m_hasCurrentPoint = false;
     std::sort(m_points.begin(), m_points.end(), [](const Point& a, const Point& b) {
-        return (a.x < b.x) || (a.x == b.x && a.y < b.y); // Sorts x-coords, if x-coords are equal sort by y-coords
+        return (a.x < b.x) || (a.x == b.x && a.y < b.y);
     });
 }
 
-// Computes Crossproduct between points
 float AndrewAlgorithm::CrossProduct(const Point& O, const Point& A, const Point& B) {
-    // If > 0 -> left turn (resp. up in the visualization), if < 0 -> right turn (resp. down in the visualization)
     return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
 }
 
-// Add point to chain with convexity check
 void AndrewAlgorithm::addPointToChain(std::vector<Point>& chain, const Point& p) {
-    // Part after && checks if cross product is <, =, or > than 0
-    // right now its <= 0, so it builds the hull clockwise, if we switch to >= 0 we build counterclockwise
     while (chain.size() >= 2 && CrossProduct(chain[chain.size()-2], chain.back(), p) <= 0) {
         chain.pop_back();
     }
     chain.push_back(p);
 }
 
-// Contains main algorithm logic
 bool AndrewAlgorithm::step() {
-    if (m_finished) return false;
+    if (m_finished) {
+        m_hasCurrentPoint = false;
+        return false;
+    }
 
     if (m_phase == Phase::UPPER) {
         if (m_index < m_points.size()) {
+            m_currentPoint = m_points[m_index];
+            m_hasCurrentPoint = true;
+
             addPointToChain(m_upper, m_points[m_index++]);
             return true;
         }
-        // switch to LOWER phase
         m_phase = Phase::LOWER;
         m_index = m_points.size() - 1;
-        return true; // switch to lower convex hull
+        m_hasCurrentPoint = false;
+        return true;
     }
 
     if (m_phase == Phase::LOWER) {
         if (m_index < m_points.size()) {
+            m_currentPoint = m_points[m_index];
+            m_hasCurrentPoint = true;
+
             addPointToChain(m_lower, m_points[m_index--]);
             return true;
         }
-        // Merge results into m_hull
         m_hull = m_upper;
-        // append lower hull, skipping first and last to avoid duplicates
         for (size_t i = 1; i + 1 < m_lower.size(); i++) {
             m_hull.push_back(m_lower[i]);
         }
         m_phase = Phase::DONE;
         m_finished = true;
+        m_hasCurrentPoint = false;
         return false;
     }
 
     return false;
 }
 
-// needed for render() in App.cpp
-bool AndrewAlgorithm::isFinished() const
-{
+bool AndrewAlgorithm::isFinished() const {
     return m_finished;
 }
 
-// Get current hull (for visualization)
 std::vector<Point> AndrewAlgorithm::getCurrentHull() {
     if (m_phase == Phase::UPPER) {
         return m_upper;
     }
     if (m_phase == Phase::LOWER) {
         std::vector<Point> current = m_upper;
-        // append partial lower
         for (size_t i = 0; i < m_lower.size(); i++) {
             current.push_back(m_lower[i]);
         }

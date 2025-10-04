@@ -1,13 +1,9 @@
+
 #include "App.h"
+#include "../algorithms/QuickHullAlgorithm.h"
+#include "../algorithms/AndrewAlgorithm.h"
+#include <map>
 
-//Default Ctor
-App::App()
-: window(sf::VideoMode({500, 500}), "SFML works!"), m_frameLimit(60)
-{
-    window.setFramerateLimit(m_frameLimit);
-}
-
-// Ctor needs points and algorithm
 App::App(unsigned int w, unsigned int h, unsigned int frameLimit, const std::vector<Point>& points, std::unique_ptr<IAlgorithm> algorithm)
 : window(sf::VideoMode({w, h}), "Convex Hull Visualisation"),
   m_frameLimit(frameLimit),
@@ -15,7 +11,6 @@ App::App(unsigned int w, unsigned int h, unsigned int frameLimit, const std::vec
   m_algorithm(std::move(algorithm))
 {
     window.setFramerateLimit(m_frameLimit);
-    m_algorithm->step(); //Essential, otherwise the animation starts with the second spacebar stroke
 }
 
 void App::run()
@@ -28,41 +23,32 @@ void App::run()
     }
 }
 
-// Eventlistener
 void App::processEvents()
 {
     while (const std::optional event = window.pollEvent())
     {
-        //TODO: Add event to reset algorithm
         if (event->is<sf::Event::KeyPressed>()) {
             auto key = event->getIf<sf::Event::KeyPressed>()->scancode;
-            // Allows stepping through the algorithm with spacebar
             if (key == sf::Keyboard::Scan::Space) {
                 m_algorithm->step();
             }
-            // Shows complete algorithm with enter
             if (key == sf::Keyboard::Scan::Enter) {
                 m_autoPlay = !m_autoPlay;
             }
-            // Quit with escape
             if (key == sf::Keyboard::Scan::Escape) {
                 window.close();
             }
-            if (key == sf::Keyboard::Scan::R)
-            {
+            if (key == sf::Keyboard::Scan::R) {
                 m_algorithm->reset(m_points);
-                m_algorithm->step();
             }
         }
     }
 }
 
-
-// For animation
 void App::update()
 {
     if (m_autoPlay) {
-        if (++m_frameCounter % 10 == 0) { // slow down steps
+        if (++m_frameCounter % 10 == 0) {
             m_algorithm->step();
         }
     }
@@ -70,36 +56,172 @@ void App::update()
 
 void App::render()
 {
-    window.clear();
+    window.clear(sf::Color(25, 25, 35));
 
-    // Draws points as small circles
+    AndrewAlgorithm* andrew = dynamic_cast<AndrewAlgorithm*>(m_algorithm.get());
+    QuickHullAlgorithm* quickhull = dynamic_cast<QuickHullAlgorithm*>(m_algorithm.get());
+
+    // Classify all points by their rendering role
+    enum class PointRole {
+        INACTIVE,       // Grey - eliminated/processed
+        NORMAL,         // Light red - regular point
+        CANDIDATE,      // Yellow - being considered
+        FARTHEST,       // Green - farthest point found
+        HULL,           // Blue - on the hull
+        CURRENT         // Orange/Purple - current point being processed
+    };
+
+    std::map<Point, PointRole> pointRoles;
+
+    // Initialize all points as NORMAL
     for (const Point& p : m_points) {
-        sf::CircleShape shape(3.0f);
-        shape.setFillColor(sf::Color::Red);
-        shape.setPosition({p.x, p.y});
+        pointRoles[p] = PointRole::NORMAL;
+    }
+
+    // Get algorithm-specific data
+    std::vector<Point> hull = m_algorithm->getCurrentHull();
+    bool finished = m_algorithm->isFinished();
+
+    // Classify points based on algorithm state
+    if (quickhull && quickhull->hasActiveSegments()) {
+        std::set<Point> activePoints = quickhull->getActivePoints();
+        bool isPreview = quickhull->isInPreviewPhase();
+
+        // Mark inactive points
+        for (const Point& p : m_points) {
+            if (activePoints.find(p) == activePoints.end()) {
+                pointRoles[p] = PointRole::INACTIVE;
+            }
+        }
+
+        // Mark candidates
+        auto candidates = quickhull->getCandidatePoints();
+
+        for (const Point& p : candidates) {
+            pointRoles[p] = PointRole::CANDIDATE;
+        }
+        // Mark farthest points (only in preview)
+        if (isPreview) {
+            auto farthest = quickhull->getFarthestPoints();
+            for (const Point& p : farthest) {
+                pointRoles[p] = PointRole::FARTHEST;
+            }
+        }
+    }
+
+    // Mark hull points (override previous classifications except CURRENT and FARTHEST)
+    for (const Point& p : hull) {
+        if (pointRoles[p] != PointRole::CURRENT && pointRoles[p] != PointRole::FARTHEST) {
+            pointRoles[p] = PointRole::HULL;
+        }
+    }
+
+    if (andrew && !andrew->isFinished()) {
+        pointRoles[andrew->getCurrentPoint()] = PointRole::CANDIDATE;
+    }
+
+    // === RENDERING PHASE ===
+    // 1. Draw hull edges first (background layer)
+    if (hull.size() >= 2) {
+        for (size_t i = 0; i < hull.size(); i++) {
+            size_t next = (i + 1) % hull.size();
+
+            sf::VertexArray edge(sf::PrimitiveType::Lines, 2);
+            edge[0].position = {hull[i].x, hull[i].y};
+            edge[1].position = {hull[next].x, hull[next].y};
+
+            if (finished) {
+                edge[0].color = sf::Color(100, 150, 255);
+                edge[1].color = sf::Color(100, 150, 255);
+            } else {
+                edge[0].color = sf::Color(120, 180, 255);
+                edge[1].color = sf::Color(120, 180, 255);
+            }
+            window.draw(edge);
+        }
+    }
+
+    // 2. Draw active segments (QuickHull only)
+    if (quickhull && quickhull->hasActiveSegments()) {
+        auto activeSegments = quickhull->getActiveSegments();
+        for (const auto& [start, end] : activeSegments) {
+            for (float offset = -1.5f; offset <= 1.5f; offset += 0.5f) {
+                sf::VertexArray line(sf::PrimitiveType::Lines, 2);
+                line[0].position = {start.x + offset, start.y};
+                line[0].color = sf::Color(255, 100, 0, 180);
+                line[1].position = {end.x + offset, end.y};
+                line[1].color = sf::Color(255, 100, 0, 180);
+                window.draw(line);
+            }
+        }
+    }
+
+    // 3. Draw all points based on their role (render each point ONCE)
+    for (const auto& [point, role] : pointRoles) {
+        sf::CircleShape shape;
+
+        switch (role) {
+            case PointRole::INACTIVE:
+                shape.setRadius(3.5f);
+                shape.setFillColor(sf::Color(80, 80, 80));
+                shape.setOutlineColor(sf::Color(60, 60, 60));
+                shape.setOutlineThickness(0.3f);
+                shape.setPosition({point.x - 3.5f, point.y - 3.5f});
+                break;
+
+            case PointRole::NORMAL:
+                shape.setRadius(3.5f);
+                shape.setFillColor(sf::Color(200, 100, 100));
+                shape.setOutlineColor(sf::Color(150, 50, 50));
+                shape.setOutlineThickness(0.5f);
+                shape.setPosition({point.x - 3.5f, point.y - 3.5f});
+                break;
+
+            case PointRole::CANDIDATE:
+                shape.setRadius(5.5f);
+                shape.setFillColor(sf::Color(255, 200, 0));
+                shape.setOutlineColor(sf::Color(255, 255, 100));
+                shape.setOutlineThickness(1.5f);
+                shape.setPosition({point.x - 5.5f, point.y - 5.5f});
+                break;
+
+            case PointRole::FARTHEST:
+                // Draw glow first
+                {
+                    sf::CircleShape glow(12.0f);
+                    glow.setFillColor(sf::Color(0, 255, 100, 60));
+                    glow.setPosition({point.x - 12.0f, point.y - 12.0f});
+                    window.draw(glow);
+                }
+                shape.setRadius(7.0f);
+                shape.setFillColor(sf::Color(0, 255, 100));
+                shape.setOutlineColor(sf::Color(255, 255, 255));
+                shape.setOutlineThickness(2.5f);
+                shape.setPosition({point.x - 7.0f, point.y - 7.0f});
+                break;
+
+            case PointRole::HULL:
+                shape.setRadius(5.0f);
+                if (finished) {
+                    shape.setFillColor(sf::Color(80, 130, 255));
+                } else {
+                    shape.setFillColor(sf::Color(100, 160, 255));
+                }
+                shape.setOutlineColor(sf::Color::White);
+                shape.setOutlineThickness(1.5f);
+                shape.setPosition({point.x - 5.0f, point.y - 5.0f});
+                break;
+
+            case PointRole::CURRENT:
+                shape.setRadius(6.0f);
+                shape.setOutlineColor(sf::Color::White);
+                shape.setOutlineThickness(3.0f);
+                shape.setPosition({point.x - 6.0f, point.y - 6.0f});
+                break;
+        }
+
         window.draw(shape);
     }
 
-    // Draws connection lines
-    std::vector<Point> hull = m_algorithm->getCurrentHull();
-    if (!hull.empty())
-    {
-        bool finished = m_algorithm->isFinished();
-
-        size_t count = finished ? hull.size() + 1 : hull.size();
-        sf::VertexArray lines(sf::PrimitiveType::LineStrip, count);
-
-        for (size_t i = 0; i < hull.size(); i++) {
-            lines[i].position = {hull[i].x, hull[i].y};
-            lines[i].color = sf::Color::Blue;
-        }
-
-        if (finished) {
-            lines[hull.size()].position = {hull[0].x, hull[0].y};
-            lines[hull.size()].color = sf::Color::Blue;
-        }
-
-        window.draw(lines);
-        window.display();
-    }
+    window.display();
 }
