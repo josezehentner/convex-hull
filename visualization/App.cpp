@@ -123,20 +123,24 @@ void App::render()
     // === RENDERING PHASE ===
     // 1. Draw hull edges first (background layer)
     if (hull.size() >= 2) {
-        for (size_t i = 0; i < hull.size(); i++) {
+        // Adjust loop bound only if AndrewAlgorithm is active and not finished
+        size_t end = hull.size();
+        if (andrew && !finished) {
+            end = hull.size() - 1;  // don’t close the loop yet
+        }
+
+        for (size_t i = 0; i < end; i++) {
             size_t next = (i + 1) % hull.size();
 
             sf::VertexArray edge(sf::PrimitiveType::Lines, 2);
             edge[0].position = {hull[i].x, hull[i].y};
             edge[1].position = {hull[next].x, hull[next].y};
 
-            if (finished) {
-                edge[0].color = sf::Color(100, 150, 255);
-                edge[1].color = sf::Color(100, 150, 255);
-            } else {
-                edge[0].color = sf::Color(120, 180, 255);
-                edge[1].color = sf::Color(120, 180, 255);
-            }
+            sf::Color col = finished ? sf::Color(100, 150, 255)
+                                     : sf::Color(120, 180, 255);
+            edge[0].color = col;
+            edge[1].color = col;
+
             window.draw(edge);
         }
     }
