@@ -1,3 +1,4 @@
+
 #include "QuickHullAlgorithm.h"
 #include <algorithm>
 #include <cmath>
@@ -11,6 +12,8 @@ void QuickHullAlgorithm::reset(const std::vector<Point>& points) {
     m_hull.clear();
     m_tasks.clear();
     m_finished = false;
+    m_hasCurrentSegment = false;
+    m_currentCandidates.clear();
 
     if (m_points.size() < 3) {
         m_hull = m_points;
@@ -65,7 +68,7 @@ void QuickHullAlgorithm::initialize() {
         m_tasks.push_back({leftmost, rightmost, upperSet, 1});
     }
     if (!lowerSet.empty()) {
-        m_tasks.push_back({rightmost, leftmost, lowerSet, (m_hull.size())});
+        m_tasks.push_back({rightmost, leftmost, lowerSet, static_cast<int>(m_hull.size())});
     }
 
     if (m_tasks.empty()) {
@@ -74,59 +77,88 @@ void QuickHullAlgorithm::initialize() {
 }
 
 bool QuickHullAlgorithm::step() {
-    if (m_finished) return false;
-
-    if (m_tasks.empty()) {
-        m_finished = true;
+    if (m_finished) {
+        m_hasCurrentSegment = false;
         return false;
     }
 
-    // Process one task
-    Task task = m_tasks.front();
-    m_tasks.pop_front();
-
-    if (task.set.empty()) {
-        return true;
+    if (m_tasks.empty()) {
+        m_finished = true;
+        m_hasCurrentSegment = false;
+        return false;
     }
 
-    // Find farthest point from line a-b
-    float maxDist = 0;
-    Point farthest;
-    bool found = false;
+    // Count how many tasks are at the current level (to process together)
+    size_t currentLevelTasks = m_tasks.size();
+    std::deque<Task> nextLevelTasks;
 
-    for (const auto& p : task.set) {
-        float dist = distanceToLine(task.a, task.b, p);
-        if (dist > maxDist) {
-            maxDist = dist;
-            farthest = p;
-            found = true;
+    // Process all tasks at the current level
+    for (size_t i = 0; i < currentLevelTasks; i++) {
+        Task task = m_tasks.front();
+        m_tasks.pop_front();
+
+        // Set current segment for visualization (use last processed task for display)
+        m_currentSegmentStart = task.a;
+        m_currentSegmentEnd = task.b;
+        m_currentCandidates = task.set;
+        m_hasCurrentSegment = true;
+
+        if (task.set.empty()) {
+            continue;
+        }
+
+        // Find farthest point from line a-b
+        float maxDist = 0;
+        Point farthest;
+        bool found = false;
+
+        for (const auto& p : task.set) {
+            float dist = distanceToLine(task.a, task.b, p);
+            if (dist > maxDist) {
+                maxDist = dist;
+                farthest = p;
+                found = true;
+            }
+        }
+
+        if (!found) {
+            continue;
+        }
+
+        m_currentFarthest = farthest;
+
+        // Insert farthest point into hull
+        m_hull.insert(m_hull.begin() + task.insertPos, farthest);
+
+        // Update insertion positions for remaining current level tasks
+        for (auto& t : m_tasks) {
+            if (t.insertPos >= task.insertPos) {
+                t.insertPos++;
+            }
+        }
+        // Update insertion positions for next level tasks
+        for (auto& t : nextLevelTasks) {
+            if (t.insertPos >= task.insertPos) {
+                t.insertPos++;
+            }
+        }
+
+        // Find points outside triangles a-farthest and farthest-b
+        std::vector<Point> leftSet = getPointsOnSide(task.a, farthest, task.set, true);
+        std::vector<Point> rightSet = getPointsOnSide(farthest, task.b, task.set, true);
+
+        // Add new tasks for next level
+        if (!leftSet.empty()) {
+            nextLevelTasks.push_back({task.a, farthest, leftSet, task.insertPos});
+        }
+        if (!rightSet.empty()) {
+            nextLevelTasks.push_back({farthest, task.b, rightSet, task.insertPos + 1});
         }
     }
 
-    if (!found) {
-        return true;
-    }
-
-    // Insert farthest point into hull
-    m_hull.insert(m_hull.begin() + task.insertPos, farthest);
-
-    // Update insertion positions for remaining tasks
-    for (auto& t : m_tasks) {
-        if (t.insertPos >= task.insertPos) {
-            t.insertPos++;
-        }
-    }
-
-    // Find points outside triangles a-farthest and farthest-b
-    std::vector<Point> leftSet = getPointsOnSide(task.a, farthest, task.set, true);
-    std::vector<Point> rightSet = getPointsOnSide(farthest, task.b, task.set, true);
-
-    // Add new tasks (process in reverse order for correct visualization)
-    if (!rightSet.empty()) {
-        m_tasks.push_front({farthest, task.b, rightSet, task.insertPos + 1});
-    }
-    if (!leftSet.empty()) {
-        m_tasks.push_front({task.a, farthest, leftSet, task.insertPos});
+    // Add next level tasks to the queue
+    for (const auto& task : nextLevelTasks) {
+        m_tasks.push_back(task);
     }
 
     return true;

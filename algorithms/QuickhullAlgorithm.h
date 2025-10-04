@@ -16,18 +16,32 @@ public:
     bool isFinished() const override;
     std::vector<Point> runCompleteAlgorithm(const std::vector<Point>& points) override;
 
+    // Additional methods for visualization
+    Point getCurrentSegmentStart() const { return m_currentSegmentStart; }
+    Point getCurrentSegmentEnd() const { return m_currentSegmentEnd; }
+    std::vector<Point> getCurrentCandidates() const { return m_currentCandidates; }
+    Point getCurrentFarthest() const { return m_currentFarthest; }
+    bool hasCurrentSegment() const { return m_hasCurrentSegment; }
+
 private:
     struct Task {
         Point a;
         Point b;
         std::vector<Point> set;
-        size_t insertPos;
+        int insertPos;
     };
 
     std::vector<Point> m_points;
     std::vector<Point> m_hull;
     std::deque<Task> m_tasks;
     bool m_finished;
+
+    // Visualization state
+    Point m_currentSegmentStart;
+    Point m_currentSegmentEnd;
+    std::vector<Point> m_currentCandidates;
+    Point m_currentFarthest;
+    bool m_hasCurrentSegment;
 
     static float cross(const Point& o, const Point& a, const Point& b);
     static float distanceToLine(const Point& a, const Point& b, const Point& p);
