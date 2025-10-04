@@ -13,7 +13,6 @@ void AndrewAlgorithm::reset(const std::vector<Point>& points) {
     m_index = 0;
     m_finished = false;
     m_phase = Phase::UPPER;
-    m_history.clear();
     m_hasCurrentPoint = false;
 
     std::sort(m_points.begin(), m_points.end(), [](const Point& a, const Point& b) {
@@ -34,8 +33,6 @@ void AndrewAlgorithm::addPointToChain(std::vector<Point>& chain, const Point& p)
 }
 
 bool AndrewAlgorithm::step() {
-    m_history.push_back({m_upper, m_lower, m_hull, m_index, m_phase, m_finished});
-
     if (m_finished) {
         m_hasCurrentPoint = false;
         return false;
@@ -75,26 +72,6 @@ bool AndrewAlgorithm::step() {
 
     return false;
 }
-
-bool AndrewAlgorithm::stepBack() {
-    if (m_history.empty()) {
-        return false;
-    }
-
-    Snapshot prev = m_history.back();
-    m_history.pop_back();
-
-    // Restore state
-    m_upper = prev.upper;
-    m_lower = prev.lower;
-    m_hull = prev.hull;
-    m_index = prev.index;
-    m_phase = prev.phase;
-    m_finished = prev.finished;
-
-    return true;
-}
-
 
 bool AndrewAlgorithm::isFinished() const {
     return m_finished;

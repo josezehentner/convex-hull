@@ -11,7 +11,6 @@ public:
     explicit AndrewAlgorithm(const std::vector<Point>& points);
 
     bool step() override;
-    bool stepBack() override;
     std::vector<Point> getCurrentHull() override;
     void reset(const std::vector<Point>& points) override;
     bool isFinished() const override; // needed for render() in App.cpp only
@@ -22,17 +21,6 @@ public:
     bool hasCurrentPoint() const { return m_hasCurrentPoint; }
     enum class Phase { UPPER, LOWER, DONE };
     Phase getPhase() const { return m_phase; }
-
-    // m_history saves Snapshot with all previous states, necessary for stepBack()
-    struct Snapshot {
-        std::vector<Point> upper;
-        std::vector<Point> lower;
-        std::vector<Point> hull;
-        size_t index;
-        Phase phase;
-        bool finished;
-    };
-    std::vector<Snapshot> m_history;
 
 private:
     std::vector<Point> m_points;

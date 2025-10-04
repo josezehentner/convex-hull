@@ -41,10 +41,6 @@ void App::processEvents()
             if (key == sf::Keyboard::Scan::R) {
                 m_algorithm->reset(m_points);
             }
-            // Goes one step back
-            if (key == sf::Keyboard::Scan::Backspace) {
-                m_algorithm->stepBack();
-            }
         }
     }
 }
