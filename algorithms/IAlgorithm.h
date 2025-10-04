@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "point_providers/Point.h"
-
 class IAlgorithm {
 public:
     virtual ~IAlgorithm() = default;

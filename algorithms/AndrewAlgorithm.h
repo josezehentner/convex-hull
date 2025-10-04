@@ -1,8 +1,10 @@
+
 #ifndef ANDREWALGORITHM_H
 #define ANDREWALGORITHM_H
 
 #include "IAlgorithm.h"
 #include <algorithm>
+#include <set>
 
 class AndrewAlgorithm : public IAlgorithm {
 public:
@@ -15,8 +17,11 @@ public:
     bool isFinished() const override; // needed for render() in App.cpp only
     std::vector<Point> runCompleteAlgorithm(const std::vector<Point>& points) override;
 
-private:
-    enum class Phase { UPPER, LOWER, DONE }; // Phases of the algo
+    // Visualization methods
+    Point getCurrentPoint() const { return m_currentPoint; }
+    bool hasCurrentPoint() const { return m_hasCurrentPoint; }
+    enum class Phase { UPPER, LOWER, DONE };
+    Phase getPhase() const { return m_phase; }
 
     // m_history saves Snapshot with all previous states, necessary for stepBack()
     struct Snapshot {
@@ -29,6 +34,7 @@ private:
     };
     std::vector<Snapshot> m_history;
 
+private:
     std::vector<Point> m_points;
     std::vector<Point> m_upper;
     std::vector<Point> m_lower;
@@ -39,7 +45,14 @@ private:
     Phase m_phase;
 
     static float crossProduct(const Point& O, const Point& A, const Point& B);
+    // Visualization state
+    Point m_currentPoint;
+    bool m_hasCurrentPoint;
+
     void addPointToChain(std::vector<Point>& chain, const Point& p);
 };
+
+// Comparison operators for Point to use in std::set
+
 
 #endif //ANDREWALGORITHM_H

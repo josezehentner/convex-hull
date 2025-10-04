@@ -7,7 +7,6 @@
 
 class App {
 public:
-    App();
     App(unsigned int width,
         unsigned int height,
         unsigned int frameLimit,
