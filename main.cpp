@@ -4,6 +4,7 @@
 #include "point_providers/FromFilePointProvider.h"
 #include "algorithms/AndrewAlgorithm.h"
 #include "algorithms/QuickhullAlgorithm.h"
+#include "performance/Performance.h"
 
 
 int main() {
@@ -48,8 +49,9 @@ int main() {
         }
         App app(1200, 800, 60, points, std::move(algo));
         app.run();
-    } else {
-        //TODO: Performance mode
+    } else if (mode == 2) {
+        Performance perf;
+        perf.run();
     }
 
     return 0;

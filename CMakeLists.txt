@@ -19,6 +19,8 @@ add_executable(convex_hull main.cpp
         algorithms/AndrewAlgorithm.h
         algorithms/QuickhullAlgorithm.h
         algorithms/QuickhullAlgorithm.cpp
+        performance/Performance.cpp
+        performance/Performance.h
 )
 
 target_include_directories(convex_hull PRIVATE
