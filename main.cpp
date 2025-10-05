@@ -5,24 +5,37 @@
 #include "algorithms/AndrewAlgorithm.h"
 #include "algorithms/QuickhullAlgorithm.h"
 
-
 int main() {
     std::cout << "Choose mode:\n1. Visualization\n2. Performance\n> ";
     int mode;
     std::cin >> mode;
+    int width {1200};
+    int height {800};
+    int fps {60};
 
     if (mode == 1) {
         std::string filename;
-        std::cout << "Enter = show whole algorithm" << std::endl;
-        std::cout << "Space = step through algorithm" << std::endl;
-        std::cout << "Esc = Quit visualization" << std::endl;
-        std::cout << "R = Reset algorithm\n" << std::endl;
-        std::cout << "Enter filename (./point_files/square.txt): " << std::endl; //TODO: Change to a better selection system
-        std::cin >> filename;
 
-        // consumes points from file and stores them in a vector
-        FromFilePointProvider provider(filename);
-        std::vector<Point> points = provider.getPoints();
+        std::cout << "Generate random points (1); or load points from a .txt file (2)?" << std::endl;
+        int pointChoice{1};
+        std::cin >> pointChoice;
+
+        std::vector<Point> points;
+        if (pointChoice == 1) {
+            int nOfPoints;
+            std::cout << "How many points do you want to create?" << std::endl;
+            std::cin >> nOfPoints;
+            RandomPointProvider provider(nOfPoints, width, height, 50);
+            points = provider.getPoints();
+
+        }
+        else {
+            // consumes points from file and stores them in a vector
+            std::cout << "Enter filename (./point_files/square.txt): " << std::endl;
+            std::cin >> filename;
+            FromFilePointProvider provider(filename);
+            points = provider.getPoints();
+        }
 
         // getting algorithm choice
         int algorithmChoice{0};
@@ -46,7 +59,13 @@ int main() {
         } else {
             algo = std::make_unique<QuickHullAlgorithm>(points);
         }
-        App app(1200, 800, 60, points, std::move(algo));
+        std::cout << "-- APP CONTROL --" << std::endl;
+        std::cout << "Enter = show whole algorithm" << std::endl;
+        std::cout << "Space = step through algorithm" << std::endl;
+        std::cout << "Esc = Quit visualization" << std::endl;
+        std::cout << "R = Reset algorithm\n" << std::endl;
+
+        App app(width, height, fps, points, std::move(algo));
         app.run();
     } else {
         //TODO: Performance mode
