@@ -13,6 +13,7 @@ int main() {
     int width {1200};
     int height {800};
     int fps {60};
+    int margin {50};
 
     if (mode == 1) {
         std::string filename;
@@ -26,7 +27,7 @@ int main() {
             int nOfPoints;
             std::cout << "How many points do you want to create?" << std::endl;
             std::cin >> nOfPoints;
-            RandomPointProvider provider(nOfPoints, width, height, 50);
+            RandomPointProvider provider(nOfPoints, width, height, margin);
             points = provider.getPoints();
 
         }
@@ -69,8 +70,28 @@ int main() {
         App app(width, height, fps, points, std::move(algo));
         app.run();
     } else if (mode == 2) {
-        Performance perf;
-        perf.run();
+        std::cout << "\n--- PERFORMANCE MODE ---\n";
+        std::cout << "Generate random points (1); or load points from a .txt file (2)?" << std::endl;
+        int pointChoice;
+        std::cin >> pointChoice;
+
+        std::vector<Point> points;
+
+        if (pointChoice == 1) {
+            int nOfPoints;
+            std::cout << "How many points do you want to create?" << std::endl;
+            std::cin >> nOfPoints;
+            RandomPointProvider provider(nOfPoints, width, height, margin);
+            points = provider.getPoints();
+        } else {
+            std::string filename;
+            std::cout << "Enter filename (e.g., ./point_files/square.txt): ";
+            std::cin >> filename;
+            FromFilePointProvider provider(filename);
+            points = provider.getPoints();
+        }
+
+        Performance::runAlgorithms(points);
     }
 
     return 0;
