@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "../point_providers/Point.h"
 #include "../algorithms/IAlgorithm.h"
+#include <functional>
 
 class App {
 public:
@@ -13,6 +14,10 @@ public:
         const std::vector<Point>& points,
         std::unique_ptr<IAlgorithm> algorithm);
     void run();
+
+    void setAlgorithms(std::vector<std::string> names,
+                   std::vector<std::function<std::unique_ptr<IAlgorithm>()>> makers,
+                   int initialIndex = 0);
 
 private:
     sf::RenderWindow window;
@@ -32,6 +37,12 @@ private:
 
     void drawOverlay();
     void loadUiFont();
+
+    std::vector<std::function<std::unique_ptr<IAlgorithm>()>> m_algoMakers;
+    std::vector<std::string> m_algoNames;
+    int m_algoIndex = 0;
+
+    void selectAlgorithm(int idx);
 };
 
 #endif
