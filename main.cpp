@@ -6,6 +6,34 @@
 #include "algorithms/QuickhullAlgorithm.h"
 #include "performance/Performance.h"
 
+void getPoints(int width, int height, int margin, std::vector<Point> &points) {
+    std::cout << "Generate random points (1); or load points from a .txt file (2)?" << std::endl;
+    int pointChoice{1};
+    std::cin >> pointChoice;
+
+    if (pointChoice == 1) {
+        int nOfPoints;
+        std::cout << "How many points do you want to create?" << std::endl;
+        std::cin >> nOfPoints;
+        RandomPointProvider provider(nOfPoints, width, height, margin);
+        points = provider.getPoints();
+    }
+    else {
+        // consumes points from file and stores them in a vector
+        while (points.empty()) {
+            std::string filename;
+            std::cout << "Enter filename (e.g., ../point_files/square.txt): " << std::endl;
+            std::cin >> filename;
+            FromFilePointProvider provider(filename);
+            points = provider.getPoints();
+
+            if (points.empty()) {
+                std::cout << "File not found! Please try again." << std::endl;
+            }
+        }
+    }
+}
+
 int main() {
     std::cout << "Choose mode:\n1. Visualization\n2. Performance\n> ";
     int mode;
@@ -16,28 +44,8 @@ int main() {
     int margin {50};
 
     if (mode == 1) {
-        std::string filename;
-
-        std::cout << "Generate random points (1); or load points from a .txt file (2)?" << std::endl;
-        int pointChoice{1};
-        std::cin >> pointChoice;
-
         std::vector<Point> points;
-        if (pointChoice == 1) {
-            int nOfPoints;
-            std::cout << "How many points do you want to create?" << std::endl;
-            std::cin >> nOfPoints;
-            RandomPointProvider provider(nOfPoints, width, height, margin);
-            points = provider.getPoints();
-
-        }
-        else {
-            // consumes points from file and stores them in a vector
-            std::cout << "Enter filename (./point_files/square.txt): " << std::endl;
-            std::cin >> filename;
-            FromFilePointProvider provider(filename);
-            points = provider.getPoints();
-        }
+        getPoints(width, height, margin, points);
 
         // getting algorithm choice
         int algorithmChoice{0};
@@ -71,25 +79,8 @@ int main() {
         app.run();
     } else if (mode == 2) {
         std::cout << "\n--- PERFORMANCE MODE ---\n";
-        std::cout << "Generate random points (1); or load points from a .txt file (2)?" << std::endl;
-        int pointChoice;
-        std::cin >> pointChoice;
-
         std::vector<Point> points;
-
-        if (pointChoice == 1) {
-            int nOfPoints;
-            std::cout << "How many points do you want to create?" << std::endl;
-            std::cin >> nOfPoints;
-            RandomPointProvider provider(nOfPoints, width, height, margin);
-            points = provider.getPoints();
-        } else {
-            std::string filename;
-            std::cout << "Enter filename (e.g., ./point_files/square.txt): ";
-            std::cin >> filename;
-            FromFilePointProvider provider(filename);
-            points = provider.getPoints();
-        }
+        getPoints(width, height, margin, points);
 
         Performance::runAlgorithms(points);
     }
