@@ -69,11 +69,6 @@ int main() {
         } else {
             algo = std::make_unique<QuickHullAlgorithm>(points);
         }
-        std::cout << "-- APP CONTROL --" << std::endl;
-        std::cout << "Enter = show whole algorithm" << std::endl;
-        std::cout << "Space = step through algorithm" << std::endl;
-        std::cout << "Esc = Quit visualization" << std::endl;
-        std::cout << "R = Reset algorithm\n" << std::endl;
 
         App app(width, height, fps, points, std::move(algo));
         app.run();

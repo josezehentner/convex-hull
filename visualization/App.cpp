@@ -11,7 +11,17 @@ App::App(unsigned int w, unsigned int h, unsigned int frameLimit, const std::vec
   m_algorithm(std::move(algorithm))
 {
     window.setFramerateLimit(m_frameLimit);
+    loadUiFont();
 }
+
+void App::loadUiFont() {
+    if (m_uiFont.openFromFile("../assets/DejaVuSans.ttf")) {
+        m_fontLoaded = true;
+        return;
+    }
+    m_fontLoaded = false;
+}
+
 
 void App::run()
 {
@@ -40,6 +50,9 @@ void App::processEvents()
             }
             if (key == sf::Keyboard::Scan::R) {
                 m_algorithm->reset(m_points);
+            }
+            if (key == sf::Keyboard::Scan::H) {
+                m_showHelp = !m_showHelp;
             }
         }
     }
@@ -227,5 +240,54 @@ void App::render()
         window.draw(shape);
     }
 
+    drawOverlay();
+
     window.display();
 }
+
+void App::drawOverlay() {
+    if (!m_showHelp || !m_fontLoaded) return;
+
+    const float pad = 8.f;
+    const float lineH = 18.f;
+    const float left = 10.f;
+    const float top  = 10.f;
+
+    const char* lines[] = {
+        "Controls",
+        "Enter = Show whole algorithm",
+        "Space = Step through algorithm",
+        "R = Reset algorithm",
+        "Esc = Quit visualization",
+        "H = Toggle help"
+    };
+    const std::size_t lineCount = sizeof(lines) / sizeof(lines[0]);
+
+    float maxW = 0.f;
+
+    sf::Text measure(m_uiFont, "", 16);
+    for (std::size_t i = 0; i < lineCount; ++i) {
+        measure.setString(lines[i]);
+        auto bounds = measure.getLocalBounds();
+        if (bounds.size.y > maxW) maxW = bounds.size.x;
+    }
+
+    const float boxW = maxW + pad * 2.f;
+    const float boxH = lineH * static_cast<float>(lineCount) + pad * 2.f;
+
+    sf::RectangleShape bg;
+    bg.setPosition({left, top});
+    bg.setSize({boxW, boxH});
+    bg.setFillColor(sf::Color(25, 25, 35));
+    window.draw(bg);
+
+    float y = top + pad;
+    for (std::size_t i = 0; i < lineCount; ++i) {
+        sf::Text t(m_uiFont, lines[i], i == 0 ? 18u : 16u);
+        t.setFillColor(sf::Color::White);
+        t.setPosition({left + pad, y});
+        window.draw(t);
+        y += lineH;
+    }
+}
+

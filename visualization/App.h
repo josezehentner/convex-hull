@@ -22,9 +22,16 @@ private:
     bool m_autoPlay = false;
     int m_frameCounter = 0;
 
+    sf::Font m_uiFont;
+    bool m_fontLoaded = false;
+    bool m_showHelp = true;
+
     void processEvents();
     void update();
     void render();
+
+    void drawOverlay();
+    void loadUiFont();
 };
 
-#endif //APP_H
+#endif
