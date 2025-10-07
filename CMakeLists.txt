@@ -33,3 +33,29 @@ target_link_libraries(convex_hull PRIVATE
         SFML::Window
         SFML::System
 )
+
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+add_library(convex_core
+        algorithms/IAlgorithm.h
+        algorithms/AndrewAlgorithm.h
+        algorithms/AndrewAlgorithm.cpp
+        algorithms/QuickhullAlgorithm.h
+        algorithms/QuickhullAlgorithm.cpp
+        point_providers/Point.h
+        point_providers/FromFilePointProvider.h
+        point_providers/FromFilePointProvider.cpp
+        point_providers/RandomPointProvider.h
+        point_providers/RandomPointProvider.cpp
+)
+
+target_include_directories(convex_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+enable_testing()
+add_subdirectory(tests)
