@@ -11,6 +11,7 @@ App::App(unsigned int w, unsigned int h, unsigned int frameLimit, const std::vec
   m_algorithm(std::move(algorithm))
 {
     window.setFramerateLimit(m_frameLimit);
+    loadUiFont();
 }
 
 void App::run()
@@ -21,6 +22,23 @@ void App::run()
         update();
         render();
     }
+}
+
+void App::setAlgorithms(std::vector<std::string> names,
+                        std::vector<std::function<std::unique_ptr<IAlgorithm>()>> makers,
+                        int initialIndex) {
+    m_algoNames  = std::move(names);
+    m_algoMakers = std::move(makers);
+
+    if (m_algoNames.empty() || m_algoMakers.empty()) return;
+
+    if (initialIndex < 0 || initialIndex >= static_cast<int>(m_algoMakers.size())) {
+        m_algoIndex = 0;
+    } else {
+        m_algoIndex = initialIndex;
+    }
+    m_algorithm = m_algoMakers[m_algoIndex]();
+    m_algorithm->reset(m_points);
 }
 
 void App::processEvents()
@@ -40,6 +58,26 @@ void App::processEvents()
             }
             if (key == sf::Keyboard::Scan::R) {
                 m_algorithm->reset(m_points);
+            }
+            if (key == sf::Keyboard::Scan::H) {
+                m_showHelp = !m_showHelp;
+            }
+
+            if (key >= sf::Keyboard::Scan::Num1 && key <= sf::Keyboard::Scan::Num9) {
+
+                m_autoPlay = false;
+
+                switch (key) {
+                    case sf::Keyboard::Scan::Num1:    return selectAlgorithm(0);
+                    case sf::Keyboard::Scan::Num2:    return selectAlgorithm(1);
+                    case sf::Keyboard::Scan::Num3:    return selectAlgorithm(2);
+                    case sf::Keyboard::Scan::Num4:    return selectAlgorithm(3);
+                    case sf::Keyboard::Scan::Num5:    return selectAlgorithm(4);
+                    case sf::Keyboard::Scan::Num6:    return selectAlgorithm(5);
+                    case sf::Keyboard::Scan::Num7:    return selectAlgorithm(6);
+                    case sf::Keyboard::Scan::Num8:    return selectAlgorithm(7);
+                    case sf::Keyboard::Scan::Num9:    return selectAlgorithm(8);
+                }
             }
         }
     }
@@ -227,5 +265,123 @@ void App::render()
         window.draw(shape);
     }
 
+    drawOverlay();
+
     window.display();
 }
+
+void App::drawOverlay() {
+    if (!m_showHelp || !m_fontLoaded) return;
+
+    const float pad   = 8.f;
+    const float left  = 10.f;
+    const float top   = 10.f;
+    const float gap   = 4.f;
+    const float chipGap = 10.f;
+
+    const unsigned titleSize = 18u;
+    const unsigned bodySize  = 16u;
+
+    const char* controls[] = {
+        "Controls",
+        "Enter = Show whole algorithm",
+        "Space = Step through algorithm",
+        "R = Reset algorithm",
+        "Esc = Quit visualization",
+        "H = Toggle help"
+    };
+    const std::size_t ctrlCount = sizeof(controls) / sizeof(controls[0]);
+
+    float maxW = 0.f;
+    float totalH = 0.f;
+
+    for (std::size_t i = 0; i < ctrlCount; ++i) {
+        const unsigned sz = (i == 0) ? titleSize : bodySize;
+        sf::Text measure(m_uiFont, controls[i], sz);
+        auto b = measure.getLocalBounds();
+        float w = b.size.x;
+        if (w > maxW) maxW = w;
+        totalH += m_uiFont.getLineSpacing(sz);
+        if (i + 1 < ctrlCount) totalH += gap;
+    }
+
+    float chipsW = 0.f;
+    if (!m_algoNames.empty()) {
+        for (std::size_t i = 0; i < m_algoNames.size(); ++i) {
+            std::string label = "[" + std::to_string(i + 1) + " " + m_algoNames[i] + "]";
+            sf::Text chip(m_uiFont, label, bodySize);
+            if (static_cast<int>(i) == m_algoIndex) {
+                chip.setStyle(sf::Text::Bold);
+            }
+            auto cb = chip.getLocalBounds();
+            chipsW += cb.size.x;
+            if (i + 1 < m_algoNames.size()) chipsW += chipGap;
+        }
+
+        totalH += m_uiFont.getLineSpacing(bodySize) + gap;
+        if (chipsW > maxW) maxW = chipsW;
+    }
+
+    const float boxW = maxW + pad * 2.f;
+    const float boxH = totalH + pad * 2.f;
+
+    sf::RectangleShape bg;
+    bg.setPosition({left, top});
+    bg.setSize({boxW, boxH});
+    bg.setFillColor(sf::Color(25, 25, 35));
+    window.draw(bg);
+
+    float y = top + pad;
+    {
+        sf::Text t(m_uiFont, controls[0], titleSize);
+        t.setFillColor(sf::Color::White);
+        t.setPosition({left + pad, y});
+        window.draw(t);
+        y += m_uiFont.getLineSpacing(titleSize) + gap;
+    }
+
+    // draw algorithm chips row
+    if (!m_algoNames.empty()) {
+        float x = left + pad;
+        for (std::size_t i = 0; i < m_algoNames.size(); ++i) {
+            std::string label = "[" + std::to_string(i + 1) + " " + m_algoNames[i] + "]";
+            sf::Text chip(m_uiFont, label, bodySize);
+            if (static_cast<int>(i) == m_algoIndex) {
+                chip.setStyle(sf::Text::Bold);
+            }
+            chip.setFillColor(sf::Color::White);
+            chip.setPosition({x, y});
+            window.draw(chip);
+
+            auto cb = chip.getLocalBounds();
+            x += cb.size.x + chipGap;
+        }
+        y += m_uiFont.getLineSpacing(bodySize) + gap;
+    }
+
+    for (std::size_t i = 1; i < ctrlCount; ++i) {
+        sf::Text t(m_uiFont, controls[i], bodySize);
+        t.setFillColor(sf::Color::White);
+        t.setPosition({left + pad, y});
+        window.draw(t);
+        y += m_uiFont.getLineSpacing(bodySize);
+        if (i + 1 < ctrlCount) y += gap;
+    }
+}
+
+void App::loadUiFont() {
+    if (m_uiFont.openFromFile("../assets/DejaVuSans.ttf")) {
+        m_fontLoaded = true;
+        return;
+    }
+    m_fontLoaded = false;
+}
+
+void App::selectAlgorithm(int idx) {
+    if (idx < 0 || idx >= static_cast<int>(m_algoMakers.size())) return;
+    m_algoIndex = idx;
+    m_algorithm = m_algoMakers[m_algoIndex]();
+    m_algorithm->reset(m_points);
+}
+
+

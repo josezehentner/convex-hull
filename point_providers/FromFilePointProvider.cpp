@@ -8,7 +8,7 @@ std::vector<Point> FromFilePointProvider::getPoints() {
     std::ifstream file(m_filename);
 
     if (!file.is_open()) {
-        throw std::runtime_error("Could not open file: " + m_filename);
+        return points;
     }
 
     int n;
@@ -22,7 +22,8 @@ std::vector<Point> FromFilePointProvider::getPoints() {
         if (!std::getline(file, line)) break;
 
         std::stringstream ss(line);
-        float x, y;
+        float x;
+        float y;
         char comma;
         if (ss >> x >> comma >> y) {
             points.push_back({x, y});
