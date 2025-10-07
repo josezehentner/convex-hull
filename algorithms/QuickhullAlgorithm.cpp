@@ -52,9 +52,9 @@ std::vector<Point> QuickHullAlgorithm::getPointsOnSide(const Point& a, const Poi
 
 void QuickHullAlgorithm::initialize() {
     auto minIt = std::min_element(m_points.begin(), m_points.end(),
-        [](const Point& a, const Point& b) { return a.x < b.x; });
+        [](const Point& a, const Point& b) { return (a.x < b.x) || (a.x == b.x && a.y < b.y); });
     auto maxIt = std::max_element(m_points.begin(), m_points.end(),
-        [](const Point& a, const Point& b) { return a.x < b.x; });
+        [](const Point& a, const Point& b) { return (a.x < b.x) || (a.x == b.x && a.y < b.y); });
 
     Point leftmost = *minIt;
     Point rightmost = *maxIt;
