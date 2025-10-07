@@ -52,9 +52,9 @@ std::vector<Point> QuickHullAlgorithm::getPointsOnSide(const Point& a, const Poi
 
 void QuickHullAlgorithm::initialize() {
     auto minIt = std::min_element(m_points.begin(), m_points.end(),
-        [](const Point& a, const Point& b) { return a.x < b.x; });
+        [](const Point& a, const Point& b) { return (a.x < b.x) || (a.x == b.x && a.y < b.y); });
     auto maxIt = std::max_element(m_points.begin(), m_points.end(),
-        [](const Point& a, const Point& b) { return a.x < b.x; });
+        [](const Point& a, const Point& b) { return (a.x < b.x) || (a.x == b.x && a.y < b.y); });
 
     Point leftmost = *minIt;
     Point rightmost = *maxIt;
@@ -269,7 +269,48 @@ std::vector<Point> QuickHullAlgorithm::getCurrentHull() {
 }
 
 std::vector<Point> QuickHullAlgorithm::runCompleteAlgorithm(const std::vector<Point>& points) {
-    reset(points);
-    while (step()) {}
-    return m_hull;
+    if (points.size() < 3) return points;
+
+    auto minIt = std::min_element(points.begin(), points.end(),
+        [](const Point& a, const Point& b) { return (a.x < b.x) || (a.x == b.x && a.y < b.y); });
+    auto maxIt = std::max_element(points.begin(), points.end(),
+        [](const Point& a, const Point& b) { return (a.x < b.x) || (a.x == b.x && a.y < b.y); });
+
+    Point leftmost = *minIt;
+    Point rightmost = *maxIt;
+
+    std::vector<Point> hull{leftmost, rightmost};
+
+    auto upperSet = getPointsOnSide(leftmost, rightmost, points, true);
+    auto lowerSet = getPointsOnSide(rightmost, leftmost, points, true);
+
+    quickHull(upperSet, leftmost, rightmost, hull);
+    quickHull(lowerSet, rightmost, leftmost, hull);
+
+    return hull;
+}
+
+
+void QuickHullAlgorithm::quickHull(const std::vector<Point>& points,
+                                   const Point& a, const Point& b,
+                                   std::vector<Point>& hull) {
+    if (points.empty()) return;
+
+    float maxDist = 0;
+    Point farthest;
+    for (const auto& p : points) {
+        float dist = distanceToLine(a, b, p);
+        if (dist > maxDist) {
+            maxDist = dist;
+            farthest = p;
+        }
+    }
+
+    hull.push_back(farthest);
+
+    auto leftSet = getPointsOnSide(a, farthest, points, true);
+    auto rightSet = getPointsOnSide(farthest, b, points, true);
+
+    quickHull(leftSet, a, farthest, hull);
+    quickHull(rightSet, farthest, b, hull);
 }
