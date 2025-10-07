@@ -2,6 +2,7 @@
 #include "App.h"
 #include "../algorithms/QuickHullAlgorithm.h"
 #include "../algorithms/AndrewAlgorithm.h"
+#include "../assets/DejaVuSans.h"
 #include <map>
 
 App::App(unsigned int w, unsigned int h, unsigned int frameLimit, const std::vector<Point>& points, std::unique_ptr<IAlgorithm> algorithm)
@@ -370,7 +371,7 @@ void App::drawOverlay() {
 }
 
 void App::loadUiFont() {
-    if (m_uiFont.openFromFile("../assets/DejaVuSans.ttf")) {
+    if (m_uiFont.openFromMemory(DejaVuSans_ttf, DejaVuSans_ttf_len)) {
         m_fontLoaded = true;
         return;
     }

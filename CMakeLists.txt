@@ -21,6 +21,7 @@ add_executable(convex_hull main.cpp
         algorithms/QuickhullAlgorithm.cpp
         performance/Performance.cpp
         performance/Performance.h
+        assets/DejaVuSans.h
 )
 
 target_include_directories(convex_hull PRIVATE
