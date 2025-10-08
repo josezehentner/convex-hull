@@ -1,28 +1,29 @@
 #include "CirclePointProvider.h"
+
 #include <cmath>
+#include <vector>
 
 CirclePointProvider::CirclePointProvider(int count, int width, int height, int margin)
     : m_count(count), m_width(width), m_height(height), m_margin(margin) {}
 
 std::vector<Point> CirclePointProvider::getPoints() {
     std::vector<Point> points;
-    points.reserve(m_count);
-
-    float cx = static_cast<float>(m_width) / 2.0f;
-    float cy = static_cast<float>(m_height) / 2.0f;
-    float radius = std::min(cx, cy) - static_cast<float>(m_margin);
-
-    if (radius <= 0.0f) {
+    if (m_count == 0) {
         return points;
     }
+    points.reserve(m_count);
 
-    const float twoPi = 2.0f * static_cast<float>(M_PI);
-    for (int i = 0; i < m_count; i++) {
-        float angle = (twoPi * i) / static_cast<float>(m_count);
-        int x = static_cast<int>(std::round(cx + radius * std::cos(angle)));
-        int y = static_cast<int>(std::round(cy + radius * std::sin(angle)));
-        points.push_back(Point{static_cast<float>(x), static_cast<float>(y)});
+    const float cx = m_height * 0.5f;
+    const float cy = m_height * 0.5f;
+    const float r  = 0.45f * m_height;
+    const float two_pi = 2 * M_PI;
+
+    for (std::size_t i = 0; i < m_count; ++i) {
+        float t = two_pi * static_cast<float>(i) / static_cast<float>(m_count);
+        Point p{};
+        p.x = cx + r * std::cos(t);
+        p.y = cy + r * std::sin(t);
+        points.push_back(p);
     }
-
     return points;
 }
