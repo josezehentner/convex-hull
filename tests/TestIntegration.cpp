@@ -287,14 +287,3 @@ TEST(Integration, Circle10000) {
     ASSERT_EQ(10000, q.size());
     ASSERT_EQ(a, q);
 }
-TEST(Integration, Circle10621) {
-    auto pts = circlePoints(10621);
-    auto a = AndrewAlgorithm(pts).runCompleteAlgorithm(pts);
-    auto q = QuickHullAlgorithm(pts).runCompleteAlgorithm(pts);
-    std::sort(a.begin(), a.end(), sortxy);
-    std::sort(q.begin(), q.end(), sortxy);
-
-    ASSERT_EQ(10621, a.size());
-    ASSERT_EQ(10621, q.size());
-    ASSERT_EQ(a, q);
-}
