@@ -1,4 +1,4 @@
-#include "QuickHullAlgorithm.h"
+#include "algorithms/QuickhullAlgorithm.h"
 #include <algorithm>
 #include <cmath>
 
