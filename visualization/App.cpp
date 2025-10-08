@@ -1,6 +1,6 @@
 
 #include "App.h"
-#include "../algorithms/QuickHullAlgorithm.h"
+#include "../algorithms/QuickhullAlgorithm.h"
 #include "../algorithms/AndrewAlgorithm.h"
 #include "../assets/DejaVuSans.h"
 #include <map>
@@ -78,6 +78,7 @@ void App::processEvents()
                     case sf::Keyboard::Scan::Num7:    return selectAlgorithm(6);
                     case sf::Keyboard::Scan::Num8:    return selectAlgorithm(7);
                     case sf::Keyboard::Scan::Num9:    return selectAlgorithm(8);
+                    default: return;
                 }
             }
         }

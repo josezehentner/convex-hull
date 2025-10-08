@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include "../algorithms/AndrewAlgorithm.h"
-#include "../algorithms/QuickHullAlgorithm.h"
+#include "../algorithms/QuickhullAlgorithm.h"
 #include <vector>
 #include <string>
 #include <algorithm>
