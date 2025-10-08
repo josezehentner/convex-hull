@@ -10,7 +10,7 @@
 #include "point_providers/SquarePointProvider.h"
 #include "protocol/Protocol.h"
 
-void getPoints(int width, int height, int margin, std::vector<Point> &points) {
+void getPoints(long width, long height, int margin, std::vector<Point> &points) {
     std::cout << "Generate points (1); or load points from a .txt file (2)?" << std::endl;
     int pointChoice{1};
     std::cin >> pointChoice;
@@ -20,9 +20,9 @@ void getPoints(int width, int height, int margin, std::vector<Point> &points) {
         std::cout << "How many points do you want to create?" << std::endl;
         std::cin >> nOfPoints;
 
-        if (log10(nOfPoints) > 3) {
-            width = width * static_cast<int>(pow(log10(nOfPoints), 2));
-            height = width;
+        if (log10(nOfPoints) > 4) {
+            width = LONG_MAX;
+            height = LONG_MAX;
         }
 
         while (points.empty()) {
@@ -91,7 +91,6 @@ int main() {
             0
         );
 
-
         app.run();
     } else if (mode == 2) {
         std::cout << "\n--- PERFORMANCE MODE ---\n";
@@ -100,7 +99,7 @@ int main() {
 
         Performance::runAlgorithms(points);
     } else if (mode == 3) {
-        std::cout << "\n--- PROTOCOL MODE ---\n";
+        std::cout << "\n--- PROTOCOL MODE ---\n\n";
         Protocol runner{};
         runner.run();
         return 0;

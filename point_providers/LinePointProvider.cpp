@@ -1,6 +1,6 @@
 #include "LinePointProvider.h"
 
-LinePointProvider::LinePointProvider(int count, int width, int height, int margin)
+LinePointProvider::LinePointProvider(int count, long width, long height, int margin)
     : m_count(count), m_width(width), m_height(height), m_margin(margin) {}
 
 std::vector<Point> LinePointProvider::getPoints() {

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cmath>
 
-SquarePointProvider::SquarePointProvider(int count, int width, int height, int margin)
+SquarePointProvider::SquarePointProvider(int count, long width, long height, int margin)
     : m_count(count), m_width(width), m_height(height), m_margin(margin) {}
 
 std::vector<Point> SquarePointProvider::getPoints() {

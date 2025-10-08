@@ -37,29 +37,29 @@ inline std::string fmt2(double v) {
 void Protocol::run() {
     struct ProviderSpec {
         std::string name;
-        std::function<std::vector<Point>(int,int,int,int)> makePoints;
+        std::function<std::vector<Point>(int,long,long,int)> makePoints;
     };
 
     std::vector<ProviderSpec> providers = {
-        {"random", [](int n, int w, int h, int m) {
+        {"random", [](int n, long w, long h, int m) {
             RandomPointProvider p(n, w, h, m);
             return p.getPoints();
         }},
-        {"circle", [](int n, int w, int h, int m) {
-            CirclePointProvider p(n, w, h, m);
-            return p.getPoints();
-        }},
-        {"square", [](int n, int w, int h, int m) {
+        {"square", [](int n, long w, long h, int m) {
             SquarePointProvider p(n, w, h, m);
             return p.getPoints();
         }},
-        {"line", [](int n, int w, int h, int m) {
+        {"line", [](int n, long w, long h, int m) {
             LinePointProvider p(n, w, h, m);
+            return p.getPoints();
+        }},
+    {"circle", [](int n, long w, long h, int m) {
+            CirclePointProvider p(n, w, h, m);
             return p.getPoints();
         }},
     };
 
-    std::vector<int> sizes = {1, 10, 100, 1000, 10000, 100000, 1000000};
+    std::vector<int> sizes = {10, 100, 1000, 10000, 100000, 1000000};
 
     std::cout << "Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull" << std::endl;
     std::cout << "---|---|---|---|---|---" << std::endl;
@@ -70,14 +70,9 @@ void Protocol::run() {
         bool first = true;
 
         for (int n : sizes) {
-            int width = 2000;
-            int height = 2000;
-            int margin = 20;
-
-            if (log10(n) > 3) {
-                width = width * static_cast<int>(pow(log10(n), 2));
-                height = width;
-            }
+            const long width = LONG_MAX;
+            const long height = LONG_MAX;
+            int margin = 0;
 
             std::vector<Point> points = prov.makePoints(n, width, height, margin);
             if (points.empty()) {

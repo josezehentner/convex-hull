@@ -6,12 +6,12 @@
 
 class CirclePointProvider : public IPointProvider {
 public:
-    CirclePointProvider(int count, int width, int height, int margin = 50);
+    CirclePointProvider(int count, long width, long height, int margin = 50);
     std::vector<Point> getPoints() override;
 
 private:
     int m_count;
-    int m_width;
-    int m_height;
+    long m_width;
+    long m_height;
     int m_margin;
 };

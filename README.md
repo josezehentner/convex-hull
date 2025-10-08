@@ -44,34 +44,30 @@ ctest
 ### Time Measurements
 Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
 ---|---|---|---|---|---
-random | 1 | 27000ns | NA | 12875ns | NA
-random | 10 | 6083ns | 0.23 | 21875ns | 1.70
-random | 100 | 28583ns | 4.70 | 60667ns | 2.77
-random | 1000 | 325291ns | 11.38 | 510875ns | 8.42
-random | 10000 | 4007291ns | 12.32 | 5667042ns | 11.09
-random | 100000 | 41070750ns | 10.25 | 56797250ns | 10.02
-random | 1000000 | 444235917ns | 10.82 | 852992083ns | 15.02
-circle | 1 | 2750ns | NA | 1666ns | NA
-circle | 10 | 8083ns | 2.94 | 13875ns | 8.33
-circle | 100 | 31958ns | 3.95 | 80500ns | 5.80
-circle | 1000 | 253750ns | 7.94 | 876750ns | 10.89
-circle | 10000 | 3554667ns | 14.01 | 9540084ns | 10.88
-circle | 100000 | 45580125ns | 12.82 | 87258333ns | 9.15
-circle | 1000000 | 523063334ns | 11.48 | 807089834ns | 9.25
-square | 1 | 3167ns | NA | 1834ns | NA
-square | 10 | 5125ns | 1.62 | 12125ns | 6.61
-square | 100 | 28208ns | 5.50 | 42541ns | 3.51
-square | 1000 | 166000ns | 5.88 | 406875ns | 9.56
-square | 10000 | 1882875ns | 11.34 | 3897792ns | 9.58
-square | 100000 | 24611042ns | 13.07 | 43288750ns | 11.11
-square | 1000000 | 332792333ns | 13.52 | 365707833ns | 8.45
-line | 1 | 2709ns | NA | 1750ns | NA
-line | 10 | 3125ns | 1.15 | 4959ns | 2.83
-line | 100 | 10750ns | 3.44 | 7958ns | 1.60
-line | 1000 | 82500ns | 7.67 | 57541ns | 7.23
-line | 10000 | 782167ns | 9.48 | 544875ns | 9.47
-line | 100000 | 7482250ns | 9.57 | 5347750ns | 9.81
-line | 1000000 | 75914792ns | 10.15 | 54201416ns | 10.14
+random | 10 | 33875ns | NA | 25542ns | NA
+random | 100 | 33666ns | 0.99 | 62208ns | 2.44
+random | 1000 | 292458ns | 8.69 | 512667ns | 8.24
+random | 10000 | 3720166ns | 12.72 | 5189625ns | 10.12
+random | 100000 | 39330666ns | 10.57 | 63116958ns | 12.16
+random | 1000000 | 456706000ns | 11.61 | 1177491000ns | 18.66
+square | 10 | 7375ns | NA | 11917ns | NA
+square | 100 | 22458ns | 3.05 | 24500ns | 2.06
+square | 1000 | 97958ns | 4.36 | 113916ns | 4.65
+square | 10000 | 984042ns | 10.05 | 811542ns | 7.12
+square | 100000 | 9795250ns | 9.95 | 8712292ns | 10.74
+square | 1000000 | 98989542ns | 10.11 | 109347250ns | 12.55
+line | 10 | 5750ns | NA | 6167ns | NA
+line | 100 | 17125ns | 2.98 | 8416ns | 1.36
+line | 1000 | 83750ns | 4.89 | 58750ns | 6.98
+line | 10000 | 972041ns | 11.61 | 837083ns | 14.25
+line | 100000 | 9681958ns | 9.96 | 6299958ns | 7.53
+line | 1000000 | 80397792ns | 8.30 | 65935333ns | 10.47
+circle | 10 | 8208ns | NA | 18625ns | NA
+circle | 100 | 32625ns | 3.97 | 109333ns | 5.87
+circle | 1000 | 293375ns | 8.99 | 960875ns | 8.79
+circle | 10000 | 3915333ns | 13.35 | 12155750ns | 12.65
+circle | 100000 | 52745125ns | 13.47 | 94935959ns | 7.81
+circle | 1000000 | 621738000ns | 11.79 | 983416042ns | 10.36
 
 The multiple displays the value in the current row divided by the value in the row above.
 

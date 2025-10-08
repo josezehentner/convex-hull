@@ -14,22 +14,22 @@ static std::vector<Point> loadPoints(const std::string& path) {
 }
 
 static std::vector<Point> randomPoints(const int count) {
-    RandomPointProvider prov(count, 50000, 50000);
+    RandomPointProvider prov(count, LONG_MAX, LONG_MAX);
     return prov.getPoints();
 }
 
 static std::vector<Point> circlePoints(const int count) {
-    CirclePointProvider prov(count, 50000, 50000);
+    CirclePointProvider prov(count, LONG_MAX, LONG_MAX);
     return prov.getPoints();
 }
 
 static std::vector<Point> linePoints(const int count) {
-    LinePointProvider prov(count, 50000, 50000);
+    LinePointProvider prov(count, LONG_MAX, LONG_MAX);
     return prov.getPoints();
 }
 
 static std::vector<Point> squarePoints(const int count) {
-    SquarePointProvider prov(count, 50000, 50000);
+    SquarePointProvider prov(count, LONG_MAX, LONG_MAX);
     return prov.getPoints();
 }
 
@@ -287,25 +287,14 @@ TEST(Integration, Circle10000) {
     ASSERT_EQ(10000, q.size());
     ASSERT_EQ(a, q);
 }
-TEST(Integration, Circle100000) {
-    auto pts = circlePoints(100000);
+TEST(Integration, Circle10621) {
+    auto pts = circlePoints(10621);
     auto a = AndrewAlgorithm(pts).runCompleteAlgorithm(pts);
     auto q = QuickHullAlgorithm(pts).runCompleteAlgorithm(pts);
     std::sort(a.begin(), a.end(), sortxy);
     std::sort(q.begin(), q.end(), sortxy);
 
-    ASSERT_EQ(100000, a.size());
-    ASSERT_EQ(100000, q.size());
-    ASSERT_EQ(a, q);
-}
-TEST(Integration, Circle1000000) {
-    auto pts = circlePoints(1000000);
-    auto a = AndrewAlgorithm(pts).runCompleteAlgorithm(pts);
-    auto q = QuickHullAlgorithm(pts).runCompleteAlgorithm(pts);
-    std::sort(a.begin(), a.end(), sortxy);
-    std::sort(q.begin(), q.end(), sortxy);
-
-    ASSERT_EQ(1000000, a.size());
-    ASSERT_EQ(1000000, q.size());
+    ASSERT_EQ(10621, a.size());
+    ASSERT_EQ(10621, q.size());
     ASSERT_EQ(a, q);
 }

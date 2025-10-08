@@ -3,7 +3,7 @@
 #include <cmath>
 #include <vector>
 
-CirclePointProvider::CirclePointProvider(int count, int width, int height, int margin)
+CirclePointProvider::CirclePointProvider(int count, long width, long height, int margin)
     : m_count(count), m_width(width), m_height(height), m_margin(margin) {}
 
 std::vector<Point> CirclePointProvider::getPoints() {
@@ -11,6 +11,7 @@ std::vector<Point> CirclePointProvider::getPoints() {
     if (m_count == 0) {
         return points;
     }
+
     points.reserve(m_count);
 
     const float cx = m_height * 0.5f;
