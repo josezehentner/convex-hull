@@ -47,6 +47,9 @@ TEST(Integration, Files) {
         "../../point_files/square2.txt",
         "../../point_files/test.txt",
         "../../point_files/triangle.txt",
+        "../../point_files/floats.txt",
+        "../../point_files/floats2.txt",
+        "../../point_files/floats3.txt",
     };
     for (const auto& f : files) {
         std::ifstream test(f);
@@ -58,6 +61,37 @@ TEST(Integration, Files) {
         std::sort(q.begin(), q.end(), sortxy);
         ASSERT_EQ(a, q);
     }
+}
+
+TEST(Integration, FilesFloatCircle) {
+    auto pts = loadPoints("../../point_files/floats.txt");
+    auto a = AndrewAlgorithm(pts).runCompleteAlgorithm(pts);
+    auto q = QuickHullAlgorithm(pts).runCompleteAlgorithm(pts);
+    std::sort(a.begin(), a.end(), sortxy);
+    std::sort(q.begin(), q.end(), sortxy);
+    ASSERT_EQ(50, a.size());
+    ASSERT_EQ(50, q.size());
+    ASSERT_EQ(a, q);
+}
+TEST(Integration, FilesFloatLine) {
+    auto pts = loadPoints("../../point_files/floats2.txt");
+    auto a = AndrewAlgorithm(pts).runCompleteAlgorithm(pts);
+    auto q = QuickHullAlgorithm(pts).runCompleteAlgorithm(pts);
+    std::sort(a.begin(), a.end(), sortxy);
+    std::sort(q.begin(), q.end(), sortxy);
+    ASSERT_EQ(2, a.size());
+    ASSERT_EQ(2, q.size());
+    ASSERT_EQ(a, q);
+}
+TEST(Integration, FilesFloatTriangle) {
+    auto pts = loadPoints("../../point_files/floats3.txt");
+    auto a = AndrewAlgorithm(pts).runCompleteAlgorithm(pts);
+    auto q = QuickHullAlgorithm(pts).runCompleteAlgorithm(pts);
+    std::sort(a.begin(), a.end(), sortxy);
+    std::sort(q.begin(), q.end(), sortxy);
+    ASSERT_EQ(3, a.size());
+    ASSERT_EQ(3, q.size());
+    ASSERT_EQ(a, q);
 }
 
 TEST(Integration, Random10) {
