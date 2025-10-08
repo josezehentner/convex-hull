@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
+
+#include "point_providers/CirclePointProvider.h"
 #include "point_providers/Point.h"
 #include "point_providers/RandomPointProvider.h"
 #include "point_providers/FromFilePointProvider.h"
+#include "point_providers/LinePointProvider.h"
+#include "point_providers/SquarePointProvider.h"
 
 TEST(PointOps, Equality) {
     Point a{0.0f, 0.0f};
@@ -35,6 +39,27 @@ TEST(PointOps, StrictWeakOrderingTransitivity) {
 
 TEST(PointProvider, Random) {
     RandomPointProvider prov(100000, 1200, 800);
+    std::vector<Point> points = prov.getPoints();
+
+    ASSERT_EQ(100000, points.size());
+}
+
+TEST(PointProvider, Circle) {
+    CirclePointProvider prov(100000, 1200, 800);
+    std::vector<Point> points = prov.getPoints();
+
+    ASSERT_EQ(100000, points.size());
+}
+
+TEST(PointProvider, Line) {
+    LinePointProvider prov(100000, 1200, 800);
+    std::vector<Point> points = prov.getPoints();
+
+    ASSERT_EQ(100000, points.size());
+}
+
+TEST(PointProvider, Square) {
+    SquarePointProvider prov(100000, 1200, 800);
     std::vector<Point> points = prov.getPoints();
 
     ASSERT_EQ(100000, points.size());

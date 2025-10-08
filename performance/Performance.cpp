@@ -105,8 +105,8 @@ void Performance::runAlgorithms(const std::vector<Point>& points) {
 
     std::cout << "Algorithm            Runtime (ms)   Hull Size\n";
     std::cout << "--------------------------------------------------------\n";
-    std::cout << "Andrew's Algorithm   " << durationA << " ns\t\t" << hullA.size() << '\n';
-    std::cout << "QuickHull Algorithm  " << durationQ << " ns\t\t" << hullQ.size() << '\n';
+    std::cout << "Andrew's Algorithm   " << durationA << "ns\t\t" << hullA.size() << '\n';
+    std::cout << "QuickHull Algorithm  " << durationQ << "ns\t\t" << hullQ.size() << '\n';
     std::cout << "--------------------------------------------------------\n";
 
     if (hullA.size() != hullQ.size()) {

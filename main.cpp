@@ -5,6 +5,7 @@
 #include "algorithms/AndrewAlgorithm.h"
 #include "algorithms/QuickhullAlgorithm.h"
 #include "performance/Performance.h"
+#include "protocol/Protocol.h"
 
 void getPoints(int width, int height, int margin, std::vector<Point> &points) {
     std::cout << "Generate random points (1); or load points from a .txt file (2)?" << std::endl;
@@ -16,7 +17,7 @@ void getPoints(int width, int height, int margin, std::vector<Point> &points) {
         std::cout << "How many points do you want to create?" << std::endl;
         std::cin >> nOfPoints;
 
-        if (log10(nOfPoints) >= 5) {
+        if (log10(nOfPoints) >= 4) {
             width = width * static_cast<int>(pow(log10(nOfPoints), 2));
             height = width;
         }
@@ -41,7 +42,7 @@ void getPoints(int width, int height, int margin, std::vector<Point> &points) {
 }
 
 int main() {
-    std::cout << "Choose mode:\n1. Visualization\n2. Performance\n> ";
+    std::cout << "Choose mode:\n1. Visualization\n2. Performance\n3. Protocol\n> ";
     int mode;
     std::cin >> mode;
     int width {1200};
@@ -74,6 +75,10 @@ int main() {
         getPoints(width, height, margin, points);
 
         Performance::runAlgorithms(points);
+    } else if (mode == 3) {
+        Protocol runner{};
+        runner.run();
+        return 0;
     }
 
     return 0;

@@ -21,6 +21,12 @@ add_library(convex_core
         point_providers/FromFilePointProvider.cpp
         point_providers/RandomPointProvider.h
         point_providers/RandomPointProvider.cpp
+        point_providers/CirclePointProvider.cpp
+        point_providers/CirclePointProvider.h
+        point_providers/LinePointProvider.cpp
+        point_providers/LinePointProvider.h
+        point_providers/SquarePointProvider.cpp
+        point_providers/SquarePointProvider.h
 )
 
 target_include_directories(convex_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -34,6 +40,8 @@ if(CONVEX_BUILD_GUI)
             visualization/App.h
             performance/Performance.cpp
             performance/Performance.h
+            protocol/Protocol.cpp
+            protocol/Protocol.h
             assets/DejaVuSans.h
     )
 
