@@ -42,34 +42,46 @@ ctest
 
 ## Test Protocol
 ### Time Measurements
-Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
----|---|---|---|---|---
-random | 10 | 33875ns | NA | 25542ns | NA
-random | 100 | 33666ns | 0.99 | 62208ns | 2.44
-random | 1000 | 292458ns | 8.69 | 512667ns | 8.24
-random | 10000 | 3720166ns | 12.72 | 5189625ns | 10.12
-random | 100000 | 39330666ns | 10.57 | 63116958ns | 12.16
-random | 1000000 | 456706000ns | 11.61 | 1177491000ns | 18.66
-square | 10 | 7375ns | NA | 11917ns | NA
-square | 100 | 22458ns | 3.05 | 24500ns | 2.06
-square | 1000 | 97958ns | 4.36 | 113916ns | 4.65
-square | 10000 | 984042ns | 10.05 | 811542ns | 7.12
-square | 100000 | 9795250ns | 9.95 | 8712292ns | 10.74
-square | 1000000 | 98989542ns | 10.11 | 109347250ns | 12.55
-line | 10 | 5750ns | NA | 6167ns | NA
-line | 100 | 17125ns | 2.98 | 8416ns | 1.36
-line | 1000 | 83750ns | 4.89 | 58750ns | 6.98
-line | 10000 | 972041ns | 11.61 | 837083ns | 14.25
-line | 100000 | 9681958ns | 9.96 | 6299958ns | 7.53
-line | 1000000 | 80397792ns | 8.30 | 65935333ns | 10.47
-circle | 10 | 8208ns | NA | 18625ns | NA
-circle | 100 | 32625ns | 3.97 | 109333ns | 5.87
-circle | 1000 | 293375ns | 8.99 | 960875ns | 8.79
-circle | 10000 | 3915333ns | 13.35 | 12155750ns | 12.65
-circle | 100000 | 52745125ns | 13.47 | 94935959ns | 7.81
-circle | 1000000 | 621738000ns | 11.79 | 983416042ns | 10.36
 
 The multiple displays the value in the current row divided by the value in the row above.
+
+#### Random
+Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
+---|---|---|---|---|---
+random | 10 | 53375ns | NA | 44417ns | NA
+random | 100 | 35917ns | 0.67 | 61709ns | 1.39
+random | 1000 | 420583ns | 11.71 | 622458ns | 10.09
+random | 10000 | 4167166ns | 9.91 | 6073166ns | 9.76
+random | 100000 | 42771291ns | 10.26 | 60688084ns | 9.99
+random | 1000000 | 449059083ns | 10.50 | 980031333ns | 16.15
+
+#### Square
+Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
+---|---|---|---|---|---
+square | 10 | 6500ns | NA | 11542ns | NA
+square | 100 | 14250ns | 2.19 | 21416ns | 1.86
+square | 1000 | 95875ns | 6.73 | 121208ns | 5.66
+square | 10000 | 967667ns | 10.09 | 901375ns | 7.44
+square | 100000 | 9798042ns | 10.13 | 9525500ns | 10.57
+square | 1000000 | 97223208ns | 9.92 | 92502375ns | 9.71
+
+#### Line
+Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
+---|---|---|---|---|---
+line | 10 | 9292ns | NA | 10209ns | NA
+line | 100 | 24166ns | 2.60 | 9375ns | 0.92
+line | 1000 | 82208ns | 3.40 | 62083ns | 6.62
+line | 10000 | 777292ns | 9.46 | 665500ns | 10.72
+line | 100000 | 7987791ns | 10.28 | 6159000ns | 9.25
+line | 1000000 | 79541541ns | 9.96 | 61075042ns | 9.92
+
+#### Circle
+Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
+---|---|---|---|---|---
+circle | 10 | 14833ns | NA | 18000ns | NA
+circle | 100 | 24917ns | 1.68 | 125291ns | 6.96
+circle | 1000 | 271084ns | 10.88 | 1354792ns | 10.81
+circle | 10000 | 3615333ns | 13.34 | 14846542ns | 10.96
 
 ### Best/Worst Case Analysis (with Big O)
 TODO

@@ -53,7 +53,7 @@ void Protocol::run() {
             LinePointProvider p(n, w, h, m);
             return p.getPoints();
         }},
-    {"circle", [](int n, long w, long h, int m) {
+        {"circle", [](int n, long w, long h, int m) {
             CirclePointProvider p(n, w, h, m);
             return p.getPoints();
         }},
@@ -70,6 +70,10 @@ void Protocol::run() {
         bool first = true;
 
         for (int n : sizes) {
+            if (prov.name == "circle" && n > 10000) {
+                continue;
+            }
+
             const long width = LONG_MAX;
             const long height = LONG_MAX;
             int margin = 0;
@@ -93,17 +97,17 @@ void Protocol::run() {
             });
 
             std::string multA = first ? "NA"
-                                      : fmt2(static_cast<double>(nsA) / static_cast<double>(prevA));
+                                    : fmt2(static_cast<double>(nsA) / static_cast<double>(prevA));
             std::string multQ = first ? "NA"
-                                      : fmt2(static_cast<double>(nsQ) / static_cast<double>(prevQ));
+                                    : fmt2(static_cast<double>(nsQ) / static_cast<double>(prevQ));
 
             std::cout
-                << prov.name << " | "
-                << n << " | "
-                << nsA << "ns | "
-                << multA << " | "
-                << nsQ << "ns | "
-                << multQ << std::endl;
+                    << prov.name << " | "
+                    << n << " | "
+                    << nsA << "ns | "
+                    << multA << " | "
+                    << nsQ << "ns | "
+                    << multQ << std::endl;
 
             prevA = nsA;
             prevQ = nsQ;

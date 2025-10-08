@@ -1,6 +1,7 @@
 #include "CirclePointProvider.h"
 
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 CirclePointProvider::CirclePointProvider(int count, long width, long height, int margin)
@@ -10,6 +11,11 @@ std::vector<Point> CirclePointProvider::getPoints() {
     std::vector<Point> points;
     if (m_count == 0) {
         return points;
+    }
+
+    if (m_count > 10000) {
+        std::cerr << "WARNING: More then 10000 points are illegal for the circle point provider" << std::endl;
+        m_count = 10000;
     }
 
     points.reserve(m_count);
