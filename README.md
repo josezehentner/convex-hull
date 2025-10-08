@@ -1,6 +1,6 @@
 # Convex Hull Algorithms
 This project contains an implementation of the Quickhull and the Andrew Convex Hull algorithms written in C++.
-For visualization the [SFML](https://www.sfml-dev.org/) framework is used.
+For visualization the [SFML](https://www.sfml-dev.org/) framework is used
 
 
 ### Authors
