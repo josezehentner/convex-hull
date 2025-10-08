@@ -74,8 +74,8 @@ void Protocol::run() {
             int height = 2000;
             int margin = 20;
 
-            if (std::log10(static_cast<double>(n)) >= 4.0) {
-                width = width * static_cast<int>(std::pow(std::log10(static_cast<double>(n)), 2.0));
+            if (log10(n) > 3) {
+                width = width * static_cast<int>(pow(log10(n), 2));
                 height = width;
             }
 

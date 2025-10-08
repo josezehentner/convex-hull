@@ -5,10 +5,13 @@
 #include "algorithms/AndrewAlgorithm.h"
 #include "algorithms/QuickhullAlgorithm.h"
 #include "performance/Performance.h"
+#include "point_providers/CirclePointProvider.h"
+#include "point_providers/LinePointProvider.h"
+#include "point_providers/SquarePointProvider.h"
 #include "protocol/Protocol.h"
 
 void getPoints(int width, int height, int margin, std::vector<Point> &points) {
-    std::cout << "Generate random points (1); or load points from a .txt file (2)?" << std::endl;
+    std::cout << "Generate points (1); or load points from a .txt file (2)?" << std::endl;
     int pointChoice{1};
     std::cin >> pointChoice;
 
@@ -17,13 +20,34 @@ void getPoints(int width, int height, int margin, std::vector<Point> &points) {
         std::cout << "How many points do you want to create?" << std::endl;
         std::cin >> nOfPoints;
 
-        if (log10(nOfPoints) >= 4) {
+        if (log10(nOfPoints) > 3) {
             width = width * static_cast<int>(pow(log10(nOfPoints), 2));
             height = width;
         }
 
-        RandomPointProvider provider(nOfPoints, width, height, margin);
-        points = provider.getPoints();
+        while (points.empty()) {
+            int pattern;
+            std::cout << "What pattern do you wanna use? (1. random, 2. circle, 3. square, 4. line)" << std::endl;
+            std::cin >> pattern;
+
+            if (pattern == 1) {
+                RandomPointProvider provider(nOfPoints, width, height, margin);
+                points = provider.getPoints();
+            } else if (pattern == 2) {
+                CirclePointProvider  provider(nOfPoints, width, height, margin);
+                points = provider.getPoints();
+            } else if (pattern == 3) {
+                SquarePointProvider  provider(nOfPoints, width, height, margin);
+                points = provider.getPoints();
+            } else if (pattern == 4) {
+                LinePointProvider  provider(nOfPoints, width, height, margin);
+                points = provider.getPoints();
+            }
+
+            if (points.empty()) {
+                std::cout << "Please enter either 1, 2, 3 or 4!" << std::endl;
+            }
+        }
     }
     else {
         // consumes points from file and stores them in a vector
@@ -76,6 +100,7 @@ int main() {
 
         Performance::runAlgorithms(points);
     } else if (mode == 3) {
+        std::cout << "\n--- PROTOCOL MODE ---\n";
         Protocol runner{};
         runner.run();
         return 0;
