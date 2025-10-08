@@ -15,6 +15,12 @@ void getPoints(int width, int height, int margin, std::vector<Point> &points) {
         int nOfPoints;
         std::cout << "How many points do you want to create?" << std::endl;
         std::cin >> nOfPoints;
+
+        if (log10(nOfPoints) >= 5) {
+            width = width * static_cast<int>(pow(log10(nOfPoints), 2));
+            height = width;
+        }
+
         RandomPointProvider provider(nOfPoints, width, height, margin);
         points = provider.getPoints();
     }
