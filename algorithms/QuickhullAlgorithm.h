@@ -24,9 +24,10 @@ public:
     std::set<Point> getActivePoints() const;
     bool hasActiveSegments() const { return !m_currentLevelTasks.empty(); }
     bool isInPreviewPhase() const { return m_inPreviewPhase; }
-    void quickHull(const std::vector<Point>& points,
-                                   const Point& a, const Point& b,
-                                   std::vector<Point>& hull);
+
+    static void quickHull(const std::vector<Point>& points,
+                          const Point& a, const Point& b,
+                          std::vector<Point>& hull);
 
 private:
     enum class Phase { PREVIEW, COMMIT };

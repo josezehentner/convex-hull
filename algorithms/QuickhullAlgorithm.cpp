@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cmath>
 
+constexpr float EPS = 1e-9;
+
 QuickHullAlgorithm::QuickHullAlgorithm(const std::vector<Point>& points) {
     reset(points);
 }
@@ -33,7 +35,7 @@ float QuickHullAlgorithm::cross(const Point& o, const Point& a, const Point& b) 
 }
 
 float QuickHullAlgorithm::distanceToLine(const Point& a, const Point& b, const Point& p) {
-    return std::abs(cross(a, b, p));
+    return std::fabs(cross(a, b, p));
 }
 
 std::vector<Point> QuickHullAlgorithm::getPointsOnSide(const Point& a, const Point& b,
@@ -41,9 +43,9 @@ std::vector<Point> QuickHullAlgorithm::getPointsOnSide(const Point& a, const Poi
     std::vector<Point> result;
     for (const auto& p : points) {
         float c = cross(a, b, p);
-        if (left && c > 0) {
+        if (left && c > EPS) {
             result.push_back(p);
-        } else if (!left && c < 0) {
+        } else if (!left && c < -EPS) {
             result.push_back(p);
         }
     }
@@ -107,11 +109,10 @@ void QuickHullAlgorithm::computePreview() {
     }
 
     // Store current level tasks for visualization
-    size_t currentLevelSize = m_tasks.size();
+    const size_t currentLevelSize = m_tasks.size();
     m_currentLevelTasks.clear();
     m_pendingTasks.clear();
-
-    for (size_t i = 0; i < currentLevelSize; i++) {
+    for (size_t i = 0; i < currentLevelSize; ++i) {
         m_currentLevelTasks.push_back(m_tasks[i]);
         m_pendingTasks.push_back(m_tasks[i]);
     }
@@ -120,20 +121,19 @@ void QuickHullAlgorithm::computePreview() {
 
     // Find farthest points for each task (preview only, don't modify hull)
     for (const auto& task : m_currentLevelTasks) {
-        if (task.set.empty()) {
-            continue;
-        }
-
-        float maxDist = 0;
-        Point farthest;
+        float maxDist = 0.0f;
         bool found = false;
+        Point farthest;
 
         for (const auto& p : task.set) {
-            float dist = distanceToLine(task.a, task.b, p);
-            if (dist > maxDist) {
-                maxDist = dist;
-                farthest = p;
-                found = true;
+            float c = cross(task.a, task.b, p);
+            if (c > EPS) {
+                float d = distanceToLine(task.a, task.b, p);
+                if (d > maxDist) {
+                    maxDist = d;
+                    farthest = p;
+                    found = true;
+                }
             }
         }
 
@@ -154,55 +154,65 @@ void QuickHullAlgorithm::commitPreview() {
     std::deque<Task> nextLevelTasks;
 
     // Now actually process and modify the hull
-    for (size_t i = 0; i < m_pendingTasks.size(); i++) {
+    const size_t toProcess = m_pendingTasks.size();
+    for (size_t i = 0; i < toProcess; ++i) {
         Task task = m_tasks.front();
         m_tasks.pop_front();
 
-        if (task.set.empty()) {
-            continue;
-        }
-
-        float maxDist = 0;
-        Point farthest;
-        bool found = false;
-
-        for (const auto& p : task.set) {
-            float dist = distanceToLine(task.a, task.b, p);
-            if (dist > maxDist) {
-                maxDist = dist;
-                farthest = p;
-                found = true;
+        // Farthest strictly on the left of AB
+        int idx = -1;
+        float maxDist = 0.0f;
+        for (int j = 0; j < static_cast<int>(task.set.size()); ++j) {
+            float c = cross(task.a, task.b, task.set[j]);
+            if (c > EPS) {
+                float d = distanceToLine(task.a, task.b, task.set[j]);
+                if (d > maxDist) {
+                    maxDist = d;
+                    idx = j;
+                }
             }
         }
-
-        if (!found) {
+        if (idx < 0) {
+            // Nothing left of AB, this branch is done
             continue;
         }
+
+        const Point farthest = task.set[idx];
 
         // Actually insert into hull
         m_hull.insert(m_hull.begin() + task.insertPos, farthest);
 
         // Update insertion positions
         for (auto& t : m_tasks) {
-            if (t.insertPos >= task.insertPos) {
-                t.insertPos++;
-            }
+            if (t.insertPos >= task.insertPos) t.insertPos++;
         }
         for (auto& t : nextLevelTasks) {
-            if (t.insertPos >= task.insertPos) {
-                t.insertPos++;
+            if (t.insertPos >= task.insertPos) t.insertPos++;
+        }
+
+        std::vector<Point> s1;
+        std::vector<Point> s2;
+        s1.reserve(task.set.size());
+        s2.reserve(task.set.size());
+
+        for (const auto& q : task.set) {
+            if ((q.x == farthest.x && q.y == farthest.y) ||
+                (q.x == task.a.x && q.y == task.a.y) ||
+                (q.x == task.b.x && q.y == task.b.y)) {
+                continue;
+            }
+            if (cross(task.a, farthest, q) > EPS) {
+                s1.push_back(q);
+            } else if (cross(farthest, task.b, q) > EPS) {
+                s2.push_back(q);
             }
         }
 
-        // Create new tasks
-        std::vector<Point> leftSet = getPointsOnSide(task.a, farthest, task.set, true);
-        std::vector<Point> rightSet = getPointsOnSide(farthest, task.b, task.set, true);
-
-        if (!leftSet.empty()) {
-            nextLevelTasks.push_back({task.a, farthest, leftSet, task.insertPos});
+        if (!s1.empty()) {
+            nextLevelTasks.push_back({task.a, farthest, std::move(s1), task.insertPos});
         }
-        if (!rightSet.empty()) {
-            nextLevelTasks.push_back({farthest, task.b, rightSet, task.insertPos + 1});
+        if (!s2.empty()) {
+            nextLevelTasks.push_back({farthest, task.b, std::move(s2), task.insertPos + 1});
         }
     }
 
@@ -214,6 +224,11 @@ void QuickHullAlgorithm::commitPreview() {
     m_currentLevelTasks.clear();
     m_currentFarthestPoints.clear();
     m_inPreviewPhase = false;
+
+    if (m_tasks.empty()) {
+        m_finished = true;
+    }
+
     updateActivePoints();
 }
 
@@ -271,46 +286,82 @@ std::vector<Point> QuickHullAlgorithm::getCurrentHull() {
 std::vector<Point> QuickHullAlgorithm::runCompleteAlgorithm(const std::vector<Point>& points) {
     if (points.size() < 3) return points;
 
-    auto minIt = std::min_element(points.begin(), points.end(),
-        [](const Point& a, const Point& b) { return (a.x < b.x) || (a.x == b.x && a.y < b.y); });
-    auto maxIt = std::max_element(points.begin(), points.end(),
-        [](const Point& a, const Point& b) { return (a.x < b.x) || (a.x == b.x && a.y < b.y); });
+    auto lessXY = [](const Point& a, const Point& b) {
+        if (a.x != b.x) return a.x < b.x;
+        return a.y < b.y;
+    };
 
-    Point leftmost = *minIt;
-    Point rightmost = *maxIt;
+    auto minIt = std::min_element(points.begin(), points.end(), lessXY);
+    auto maxIt = std::max_element(points.begin(), points.end(), lessXY);
 
-    std::vector<Point> hull{leftmost, rightmost};
+    const Point leftmost = *minIt;
+    const Point rightmost = *maxIt;
 
-    auto upperSet = getPointsOnSide(leftmost, rightmost, points, true);
-    auto lowerSet = getPointsOnSide(rightmost, leftmost, points, true);
+    std::vector<Point> upperSet;
+    std::vector<Point> lowerSet;
+    upperSet.reserve(points.size());
+    lowerSet.reserve(points.size());
 
+    for (const auto& p : points) {
+        float c = cross(leftmost, rightmost, p);
+        if (c > EPS) upperSet.push_back(p);
+        else if (c < -EPS) lowerSet.push_back(p);
+    }
+
+    std::vector<Point> hull;
+    hull.reserve(points.size());
+
+    hull.push_back(leftmost);
     quickHull(upperSet, leftmost, rightmost, hull);
+    hull.push_back(rightmost);
     quickHull(lowerSet, rightmost, leftmost, hull);
 
     return hull;
 }
 
-
-void QuickHullAlgorithm::quickHull(const std::vector<Point>& points,
+void QuickHullAlgorithm::quickHull(const std::vector<Point>& setAB,
                                    const Point& a, const Point& b,
                                    std::vector<Point>& hull) {
-    if (points.empty()) return;
+    if (setAB.empty()) {
+        return;
+    }
 
-    float maxDist = 0;
-    Point farthest;
-    for (const auto& p : points) {
-        float dist = distanceToLine(a, b, p);
-        if (dist > maxDist) {
-            maxDist = dist;
-            farthest = p;
+    float maxDist = 0.0f;
+    int idx = -1;
+    for (int i = 0; i < static_cast<int>(setAB.size()); ++i) {
+        float c = cross(a, b, setAB[i]);
+        if (c > EPS) { // Strictly left of AB
+            float d = distanceToLine(a, b, setAB[i]);
+            if (d > maxDist) {
+                maxDist = d;
+                idx = i;
+            }
         }
     }
 
-    hull.push_back(farthest);
+    // If nothing strictly left or only numerically collinear, stop
+    if (idx < 0) return;
 
-    auto leftSet = getPointsOnSide(a, farthest, points, true);
-    auto rightSet = getPointsOnSide(farthest, b, points, true);
+    const Point p = setAB[idx];
 
-    quickHull(leftSet, a, farthest, hull);
-    quickHull(rightSet, farthest, b, hull);
+    std::vector<Point> s1;
+    std::vector<Point> s2;
+    s1.reserve(setAB.size());
+    s2.reserve(setAB.size());
+
+    for (int i = 0; i < static_cast<int>(setAB.size()); ++i) {
+        const Point& q = setAB[i];
+        if ((q.x == p.x && q.y == p.y) || (q.x == a.x && q.y == a.y) || (q.x == b.x && q.y == b.y))
+            continue;
+
+        if (cross(a, p, q) > EPS) {
+            s1.push_back(q);
+        } else if (cross(p, b, q) > EPS) {
+            s2.push_back(q);
+        }
+    }
+
+    quickHull(s1, a, p, hull);
+    hull.push_back(p);
+    quickHull(s2, p, b, hull);
 }

@@ -1,6 +1,8 @@
 #include "AndrewAlgorithm.h"
 #include <iostream>
 
+constexpr float EPS = 1e-9;
+
 AndrewAlgorithm::AndrewAlgorithm(const std::vector<Point>& points) {
     AndrewAlgorithm::reset(points);
 }
@@ -26,7 +28,7 @@ float AndrewAlgorithm::crossProduct(const Point& O, const Point& A, const Point&
 }
 
 void AndrewAlgorithm::addPointToChain(std::vector<Point>& chain, const Point& p) {
-    while (chain.size() >= 2 && crossProduct(chain[chain.size()-2], chain.back(), p) <= 0) {
+    while (chain.size() >= 2 && crossProduct(chain[chain.size()-2], chain.back(), p) <= EPS) {
         chain.pop_back();
     }
     chain.push_back(p);
