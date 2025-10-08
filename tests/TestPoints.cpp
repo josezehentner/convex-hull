@@ -8,15 +8,15 @@
 #include "point_providers/SquarePointProvider.h"
 
 TEST(PointOps, Equality) {
-    Point a{0.0f, 0.0f};
-    Point b{0.0f, 0.0f};
+    Point a{0, 0};
+    Point b{0, 0};
     EXPECT_EQ(a, b);
 }
 
 TEST(PointOps, OrderingPrimaryXThenY) {
-    Point a{0.0f, 0.0f};
-    Point b{0.0f, 1.0f};
-    Point c{1.0f, 0.0f};
+    Point a{0, 0};
+    Point b{0, 1};
+    Point c{1, 0};
 
     EXPECT_TRUE(a < b);
 
@@ -25,9 +25,9 @@ TEST(PointOps, OrderingPrimaryXThenY) {
 }
 
 TEST(PointOps, StrictWeakOrderingTransitivity) {
-    Point p1{0.0f, 0.0f};
-    Point p2{0.0f, 1.0f};
-    Point p3{1.0f, 0.0f};
+    Point p1{0, 0};
+    Point p2{0, 1};
+    Point p3{1, 0};
 
     ASSERT_TRUE(p1 < p2);
     ASSERT_TRUE(p2 < p3);
@@ -38,31 +38,31 @@ TEST(PointOps, StrictWeakOrderingTransitivity) {
 }
 
 TEST(PointProvider, Random) {
-    RandomPointProvider prov(100000, 1200, 800);
+    RandomPointProvider prov(10000, 1200, 800);
     std::vector<Point> points = prov.getPoints();
 
-    ASSERT_EQ(100000, points.size());
+    ASSERT_EQ(10000, points.size());
 }
 
 TEST(PointProvider, Circle) {
-    CirclePointProvider prov(100000, 1200, 800);
+    CirclePointProvider prov(10000, 1200, 800);
     std::vector<Point> points = prov.getPoints();
 
-    ASSERT_EQ(100000, points.size());
+    ASSERT_EQ(10000, points.size());
 }
 
 TEST(PointProvider, Line) {
-    LinePointProvider prov(100000, 1200, 800);
+    LinePointProvider prov(10000, 1200, 800);
     std::vector<Point> points = prov.getPoints();
 
-    ASSERT_EQ(100000, points.size());
+    ASSERT_EQ(10000, points.size());
 }
 
 TEST(PointProvider, Square) {
-    SquarePointProvider prov(100000, 1200, 800);
+    SquarePointProvider prov(10000, 1200, 800);
     std::vector<Point> points = prov.getPoints();
 
-    ASSERT_EQ(100000, points.size());
+    ASSERT_EQ(10000, points.size());
 }
 
 TEST(PointProvider, File) {

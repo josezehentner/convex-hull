@@ -13,7 +13,7 @@ TEST(AndrewBasics, Triangle) {
 }
 
 TEST(AndrewBasics, SquareWithCollinear) {
-    std::vector<Point> pts{{0,0},{1,0},{1,1},{0,1},{0.5f,0},{0.5f,1}};
+    std::vector<Point> pts{{0,0},{2,0},{2,2},{0,2},{1,0},{1,2}};
     auto hull = runAndrew(pts);
     ASSERT_EQ(hull.size(), 4);
 }
