@@ -1,7 +1,7 @@
 #include "AndrewAlgorithm.h"
 #include <iostream>
 
-constexpr float EPS = 1e-9;
+constexpr double EPS = 1e-9;
 
 AndrewAlgorithm::AndrewAlgorithm(const std::vector<Point>& points) {
     AndrewAlgorithm::reset(points);

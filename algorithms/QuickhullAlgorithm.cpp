@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cmath>
 
-constexpr float EPS = 1e-9;
+constexpr double EPS = 1e-9;
 
 QuickHullAlgorithm::QuickHullAlgorithm(const std::vector<Point>& points) {
     reset(points);

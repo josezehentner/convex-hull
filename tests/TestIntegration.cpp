@@ -11,7 +11,7 @@ static std::vector<Point> loadPoints(const std::string& path) {
 }
 
 static std::vector<Point> randomPoints(const int count) {
-    RandomPointProvider prov(count, 1200, 800);
+    RandomPointProvider prov(count, 50000, 50000);
     return prov.getPoints();
 }
 
