@@ -330,7 +330,7 @@ void App::drawOverlay() {
     sf::RectangleShape bg;
     bg.setPosition({left, top});
     bg.setSize({boxW, boxH});
-    bg.setFillColor(sf::Color(25, 25, 35));
+    bg.setFillColor(sf::Color(25, 25, 35, 100));
     window.draw(bg);
 
     float y = top + pad;
