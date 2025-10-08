@@ -83,5 +83,10 @@ circle | 100 | 24917ns | 1.68 | 125291ns | 6.96
 circle | 1000 | 271084ns | 10.88 | 1354792ns | 10.81
 circle | 10000 | 3615333ns | 13.34 | 14846542ns | 10.96
 
+Please note that our implementation can only generate 10,000 points for the circular pattern.
+
 ### Best/Worst Case Analysis (with Big O)
-TODO
+Algorithm                   | Best Case Scenario                                                                                                                                                | Worst Case Scenario                                                                                                                     | Big O Notation                       | Explanation                                                                                                                        
+--------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | -----------------------------------------------------------------------------------------------------------------------------------
+**Andrew’s Monotone Chain** | When points are uniformly distributed along a convex shape (e.g., a circle or square), the algorithm processes sorted points once and discards most inner points. | When many points lie on the hull (e.g., all points on a line), the algorithm must process and keep almost every point.                  | **O(n log n)**                       | Sorting dominates runtime. The hull construction step is linear, so overall complexity remains O(n log n).                         
+**Quickhull**               | When most points lie inside the convex hull (e.g., uniform random distribution), partitioning divides the data efficiently and recursion depth is small.          | When all points lie on the hull (e.g., points on a circle or line), recursion becomes highly unbalanced, requiring near-quadratic work. | **O(n log n)** best, **O(n²)** worst | Quickhull’s recursive partitioning behaves like Quicksort. Balanced partitions yield O(n log n), unbalanced partitions cause O(n²).
