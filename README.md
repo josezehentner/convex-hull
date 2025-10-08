@@ -2,6 +2,10 @@
 This project contains an implementation of the Quickhull and the Andrew Convex Hull algorithms written in C++.
 For visualization the [SFML](https://www.sfml-dev.org/) framework is used.
 
+
+### Authors
+Iyamu Daniel, Rehm Gilian, Zehentner José
+
 ## Requirements
 1. C++ 20 compiler
 2. CMake version 4.0
