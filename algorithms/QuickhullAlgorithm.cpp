@@ -335,35 +335,22 @@ std::vector<Point> QuickHullAlgorithm::getCurrentHull() {
 std::vector<Point> QuickHullAlgorithm::runCompleteAlgorithm(const std::vector<Point>& points) {
     if (points.size() < 3) return points;
 
-    // Comparison helper for sorting by x then y
     auto lessXY = [](const Point& a, const Point& b) {
         if (a.x != b.x) return a.x < b.x;
         return a.y < b.y;
     };
 
-    // Find extreme left and right points
-    auto minIt = std::min_element(points.begin(), points.end(), lessXY);
-    auto maxIt = std::max_element(points.begin(), points.end(), lessXY);
+    const auto minIt = std::min_element(points.begin(), points.end(), lessXY);
+    const auto maxIt = std::max_element(points.begin(), points.end(), lessXY);
 
-    const Point leftmost = *minIt;
+    const Point leftmost  = *minIt;
     const Point rightmost = *maxIt;
 
-    // Split points into upper and lower sets relative to base line
-    std::vector<Point> upperSet;
-    std::vector<Point> lowerSet;
-    upperSet.reserve(points.size());
-    lowerSet.reserve(points.size());
-
-    for (const auto& p : points) {
-        float c = cross(leftmost, rightmost, p);
-        if (c > EPS) upperSet.push_back(p);
-        else if (c < -EPS) lowerSet.push_back(p);
-    }
+    const std::vector<Point> upperSet = getPointsOnSide(leftmost, rightmost, points, true);
+    const std::vector<Point> lowerSet = getPointsOnSide(leftmost, rightmost, points, false);
 
     std::vector<Point> hull;
     hull.reserve(points.size());
-
-    // Build hull recursively
     hull.push_back(leftmost);
     quickHull(upperSet, leftmost, rightmost, hull);
     hull.push_back(rightmost);
@@ -372,55 +359,46 @@ std::vector<Point> QuickHullAlgorithm::runCompleteAlgorithm(const std::vector<Po
     return hull;
 }
 
+
 // Recursive function: process subset of points to find and add hull points
 void QuickHullAlgorithm::quickHull(const std::vector<Point>& setAB,
                                    const Point& a, const Point& b,
                                    std::vector<Point>& hull) {
-    if (setAB.empty()) {
-        return;
-    }
+    if (setAB.empty()) return;
 
-    // Find the farthest point from line AB on its left side
+    // Find farthest exactly like before, scan the original setAB
+    int   idx = -1;
     float maxDist = 0.0f;
-    int idx = -1;
     for (int i = 0; i < static_cast<int>(setAB.size()); ++i) {
-        float c = cross(a, b, setAB[i]);
-        if (c > EPS) { // Only consider points on left side
-            float d = distanceToLine(a, b, setAB[i]);
+        const float c = cross(a, b, setAB[i]);
+        if (c > EPS) {
+            const float d = distanceToLine(a, b, setAB[i]);
             if (d > maxDist) {
                 maxDist = d;
                 idx = i;
             }
         }
     }
-
-    // Base case: no point strictly left of AB
     if (idx < 0) return;
 
     const Point p = setAB[idx];
 
-    // Split remaining points into subsets for recursion
-    std::vector<Point> s1;
-    std::vector<Point> s2;
-    s1.reserve(setAB.size());
-    s2.reserve(setAB.size());
+    // Partition using the shared helper on the same base set
+    std::vector<Point> s1 = getPointsOnSide(a, p, setAB, true);
+    std::vector<Point> s2 = getPointsOnSide(p, b, setAB, true);
 
-    for (int i = 0; i < static_cast<int>(setAB.size()); ++i) {
-        const Point& q = setAB[i];
-        // Skip the farthest point and endpoints
-        if ((q.x == p.x && q.y == p.y) || (q.x == a.x && q.y == a.y) || (q.x == b.x && q.y == b.y))
-            continue;
+    // Keep the explicit exclusions, matches the original loop behavior
+    auto dropEndpoints = [&](std::vector<Point>& s) {
+        s.erase(std::remove_if(s.begin(), s.end(), [&](const Point& q) {
+            return (q.x == p.x && q.y == p.y) ||
+                   (q.x == a.x && q.y == a.y) ||
+                   (q.x == b.x && q.y == b.y);
+        }), s.end());
+    };
+    dropEndpoints(s1);
+    dropEndpoints(s2);
 
-        // Assign points to one of the two new subsets
-        if (cross(a, p, q) > EPS) {
-            s1.push_back(q);
-        } else if (cross(p, b, q) > EPS) {
-            s2.push_back(q);
-        }
-    }
-
-    // Recursively process the subsets
     quickHull(s1, a, p, hull);
-    hull.push_back(p); // Add the farthest point between the recursions
+    hull.push_back(p);
     quickHull(s2, p, b, hull);
 }

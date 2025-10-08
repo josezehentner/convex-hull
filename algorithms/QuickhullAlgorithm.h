@@ -55,7 +55,7 @@ private:
     static float cross(const Point& o, const Point& a, const Point& b);
     static float distanceToLine(const Point& a, const Point& b, const Point& p);
     void initialize();
-    std::vector<Point> getPointsOnSide(const Point& a, const Point& b, const std::vector<Point>& points, bool left);
+    static std::vector<Point> getPointsOnSide(const Point& a, const Point& b, const std::vector<Point>& points, bool left);
     void updateActivePoints();
     void computePreview();
     void commitPreview();
