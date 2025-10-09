@@ -45,6 +45,10 @@ ctest
 ```
 
 ## Test Protocol
+
+<mark>As discussed, we did not measure the times in release mode in the original submission, as we were not aware of its existence.
+To correct that mistake, there is now this second (delayed) submission.</mark>
+
 ### Time Measurements
 
 The multiple displays the value in the current row divided by the value in the row above.
@@ -52,40 +56,40 @@ The multiple displays the value in the current row divided by the value in the r
 #### Random
 Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
 ---|---|---|---|---|---
-random | 10 | 53375ns | NA | 44417ns | NA
-random | 100 | 35917ns | 0.67 | 61709ns | 1.39
-random | 1000 | 420583ns | 11.71 | 622458ns | 10.09
-random | 10000 | 4167166ns | 9.91 | 6073166ns | 9.76
-random | 100000 | 42771291ns | 10.26 | 60688084ns | 9.99
-random | 1000000 | 449059083ns | 10.50 | 980031333ns | 16.15
+random | 10 | 11000ns | NA | 17583ns | NA
+random | 100 | 25708ns | 2.34 | 81917ns | 4.66
+random | 1000 | 292166ns | 11.36 | 503333ns | 6.14
+random | 10000 | 3873875ns | 13.26 | 5591250ns | 11.11
+random | 100000 | 30199083ns | 7.80 | 29773625ns | 5.33
+random | 1000000 | 174539625ns | 5.78 | 465508791ns | 15.63
 
 #### Square
 Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
 ---|---|---|---|---|---
-square | 10 | 6500ns | NA | 11542ns | NA
-square | 100 | 14250ns | 2.19 | 21416ns | 1.86
-square | 1000 | 95875ns | 6.73 | 121208ns | 5.66
-square | 10000 | 967667ns | 10.09 | 901375ns | 7.44
-square | 100000 | 9798042ns | 10.13 | 9525500ns | 10.57
-square | 1000000 | 97223208ns | 9.92 | 92502375ns | 9.71
+square | 10 | 5500ns | NA | 5917ns | NA
+square | 100 | 4167ns | 0.76 | 7125ns | 1.20
+square | 1000 | 19250ns | 4.62 | 24500ns | 3.44
+square | 10000 | 170666ns | 8.87 | 187375ns | 7.65
+square | 100000 | 1636709ns | 9.59 | 1790000ns | 9.55
+square | 1000000 | 15879958ns | 9.70 | 17804458ns | 9.95
 
 #### Line
 Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
 ---|---|---|---|---|---
-line | 10 | 9292ns | NA | 10209ns | NA
-line | 100 | 24166ns | 2.60 | 9375ns | 0.92
-line | 1000 | 82208ns | 3.40 | 62083ns | 6.62
-line | 10000 | 777292ns | 9.46 | 665500ns | 10.72
-line | 100000 | 7987791ns | 10.28 | 6159000ns | 9.25
-line | 1000000 | 79541541ns | 9.96 | 61075042ns | 9.92
+line | 10 | 1250ns | NA | 1250ns | NA
+line | 100 | 2375ns | 1.90 | 1875ns | 1.50
+line | 1000 | 17416ns | 7.33 | 15250ns | 8.13
+line | 10000 | 134125ns | 7.70 | 152167ns | 9.98
+line | 100000 | 1293875ns | 9.65 | 1428917ns | 9.39
+line | 1000000 | 12862500ns | 9.94 | 14316500ns | 10.02
 
 #### Circle
 Pattern | Number of Points | Time Andrew | Multiple Andrew | Time Quickhull | Multiple Quickhull
 ---|---|---|---|---|---
-circle | 10 | 14833ns | NA | 18000ns | NA
-circle | 100 | 24917ns | 1.68 | 125291ns | 6.96
-circle | 1000 | 271084ns | 10.88 | 1354792ns | 10.81
-circle | 10000 | 3615333ns | 13.34 | 14846542ns | 10.96
+circle | 10 | 2000ns | NA | 4250ns | NA
+circle | 100 | 11000ns | 5.50 | 28250ns | 6.65
+circle | 1000 | 80125ns | 7.28 | 288292ns | 10.21
+circle | 10000 | 1076791ns | 13.44 | 2621584ns | 9.09
 
 Please note that our implementation can only generate 10,000 points for the circular pattern.
 
