@@ -40,7 +40,4 @@ private:
     void addPointToChain(std::vector<Point>& chain, const Point& p);
 };
 
-// Comparison operators for Point to use in std::set
-
-
 #endif //ANDREWALGORITHM_H

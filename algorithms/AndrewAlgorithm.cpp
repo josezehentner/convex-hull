@@ -71,7 +71,6 @@ bool AndrewAlgorithm::step() {
         m_hasCurrentPoint = false;
         return false;
     }
-
     return false;
 }
 

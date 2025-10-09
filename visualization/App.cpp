@@ -1,4 +1,3 @@
-
 #include "App.h"
 #include "../algorithms/QuickhullAlgorithm.h"
 #include "../algorithms/AndrewAlgorithm.h"
